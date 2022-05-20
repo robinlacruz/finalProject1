@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>My_Project</fullName>
+    <columns>NAME</columns>
+    <filterScope>Mine</filterScope>
+    <label>My Project</label>
+    <sharedTo>
+        <group>OnlyMyProjects</group>
+        <role>Project_Manager</role>
+    </sharedTo>
+</ListView>
