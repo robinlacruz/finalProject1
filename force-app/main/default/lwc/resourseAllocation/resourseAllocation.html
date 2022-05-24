@@ -8,7 +8,7 @@
             <div if:true={projectLineItems}>
                 <template for:each={projectLineItems} for:item="projectLineItem">
                     <div key={projectLineItem.Id}>  
-                            <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} - Estimated Hours: {projectLineItem.Estimated_Hours__c}     - Assigned Hours:</h1>
+                            <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} - Estimated Hours: {projectLineItem.Estimated_Hours__c}     - Assigned Hours: {projectLineItem.Current_Hours__c}</h1>
                             <template if:true={projectLineItem.data1}>
                                 <div style="height: 15vh;">
                                     <lightning-datatable

@@ -4,6 +4,8 @@ import getResourcesByRole from '@salesforce/apex/ProjectAndResources.getResource
 import getProjectLineItems from '@salesforce/apex/ProjectAndResources.getProjectLineItems';
 import getProjectAssignedResources from '@salesforce/apex/ProjectAndResources.getProjectAssignedResources';
 import getResourcesById from '@salesforce/apex/ProjectAndResources.getResourcesById';
+import insertPARs from '@salesforce/apex/ProjectAndResources.insertPARs';
+import {refreshApex} from'@salesforce/apex';
 
 const columns = [
     { label: 'Resource Name', fieldName: 'resourceName', editable: false },
@@ -22,6 +24,8 @@ export default class ResourseAllocation extends LightningElement {
     rowOffset = 0;
     resourcesById;
     projectLineItemsByRole;
+    changedFlag;
+    
 
     
     @wire (getProjects)
@@ -41,13 +45,14 @@ export default class ResourseAllocation extends LightningElement {
 
     @wire (getProjectLineItems,{projectId:'$projectId'})
     receivedProjectLineItems(result){
+        this.changedFlag=result;
         const {data, error}=result;
         if(data){
             let receivedPLIs = data;
             let PLIarray=[];
             //console.log('antes del for de projectLineItems',data);
             for(let i=0;i<receivedPLIs.length;i++){
-                let {Id, Name, Role__c, Estimated_Hours__c}  = receivedPLIs[i];
+                let {Id, Name, Role__c, Estimated_Hours__c,Current_Hours__c}  = receivedPLIs[i];
 
                 let resources = this.getResource(receivedPLIs[i].Role__c);
                 console.log('Resources->'+JSON.stringify(resources));
@@ -56,7 +61,7 @@ export default class ResourseAllocation extends LightningElement {
                     data1.push({resourceId:element.Id,resourceName:element.Name,resourceRate:element.Rate_p_hour__c,startDate:null,endDate:null,pliId:receivedPLIs[i].Id,resourceRole:element.Role__c});
                 });
 
-                PLIarray[i] = {Id:Id,Name:Name,Role__c:Role__c,Estimated_Hours__c:Estimated_Hours__c,data1:data1};
+                PLIarray[i] = {Id:Id,Name:Name,Role__c:Role__c,Estimated_Hours__c:Estimated_Hours__c,data1:data1,Current_Hours__c:Current_Hours__c};
             }
             this.projectLineItems=PLIarray;
             this.projectLineItemsByRole= new Map(this.projectLineItems.map(elemento=>{
@@ -101,6 +106,11 @@ export default class ResourseAllocation extends LightningElement {
         return 'Por ahora nada';
     }
 
+    async refresh() {
+        console.log('dentro de refresh()');
+        await refreshApex(this.changedFlag);
+    }
+
     handleSave(data) {
         
         //console.log('los draftValues son:');
@@ -113,11 +123,16 @@ export default class ResourseAllocation extends LightningElement {
             let businessDays = getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate))
             let assignedHours = 8*businessDays;
             //console.log('assignedHours -> ',assignedHours);
-            let projAssignResource = {Name:`ProjAssRes${user.Name}`, User__c:user.Id,Start_Date__c:element.startDate,End_Date__c:element.endDate ,Project_Line_Item__c:pli.Id ,Assigned_Hour__c:assignedHours};
+            let projAssignResource = {Name:`ProjAssRes${user.Name}`, User__c:user.Id,Start_Date__c:element.startDate,End_Date__c:element.endDate ,Project_Line_Item__c:pli.Id ,Assigned_Hour__c:parseInt(assignedHours)};
             pliToInsert.push(projAssignResource);
 
         }); 
         console.log(pliToInsert); 
+        insertPARs({PARsList: pliToInsert}).then(data=>{
+            console.log('dentro de insertPARs ->',data);
+            this.refresh();
+        })
+        
 
         function getBusinessDatesCount(startDate, endDate) {
             let count = 0;

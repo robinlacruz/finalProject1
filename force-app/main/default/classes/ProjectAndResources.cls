@@ -37,4 +37,10 @@ public with sharing class ProjectAndResources {
     public static List<Project_Assigned_Resource__c> getProjectAssignedResources(Id projectId) {
         return [SELECT Id, User__c, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId];
     }
+
+    @AuraEnabled(cacheable=false)
+    public static String insertPARs(List<Project_Assigned_Resource__c> PARsList){
+        insert PARsList;
+        return 'inserted';
+    }
 }
