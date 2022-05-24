@@ -1,47 +1,34 @@
+<!-- sldsValidatorIgnore -->
+<!-- style="height: 150px;"  -->
 <template>
     <div if:true={project}>
-        <h1> Project Name: {project.Name} </h1>
-        <br>
-        <div if:true={projectLineItems}>
-            <template for:each={projectLineItems} for:item="projectLineItem">
-                <div key={projectLineItem.Id}> {projectLineItem.Role__c} - Estimated Hours: {projectLineItem.Estimated_Hours__c} 
-
-                    
-                        <template if:true={projectLineItem}>
-                            <lightning-checkbox-group name="Checkbox Group"
-                                                      label="Checkbox Group"
-                                                      options={projectLineItem.Resources}
-                                                      value={value}
-                                                      onchange={handleChange}
-                                                      
-                                                      ></lightning-checkbox-group>
-                            <p>Selected Values are: {selectedValues}</p>
-                        </template>
-                    
-                </div>
-            </template> 
-        </div>
-        <div if:false={projectLineItems}> NO HAY PROJECT LINE ITEMS </div>
-        <div if:false={resourcesByRole}> NO SE CARGO NADA </div>
+        <lightning-card  variant="Narrow" icon-name="standard:account">
+            <h1 slot="title">Project Name: {project.Name}</h1>
+            <br>
+            <div if:true={projectLineItems}>
+                <template for:each={projectLineItems} for:item="projectLineItem">
+                    <div key={projectLineItem.Id}>  
+                            <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} - Estimated Hours: {projectLineItem.Estimated_Hours__c}     - Assigned Hours:</h1>
+                            <template if:true={projectLineItem.data1}>
+                                <div style="height: 15vh;">
+                                    <lightning-datatable
+                                            key-field="resourceId"
+                                            data={projectLineItem.data1}
+                                            show-row-number-column
+                                            row-number-offset={rowOffset}
+                                            columns={columns}
+                                            onsave={handleSave}
+                                            oncancel={handleCancel}>
+                                    </lightning-datatable>
+                                </div>
+                            </template>
+                    </div>
+                </template> 
+            </div>
+            <div if:false={projectLineItems}> NO HAY PROJECT LINE ITEMS </div>
+            <div if:false={resourcesByRole}> NO SE CARGO NADA </div>
+        </lightning-card>
     </div>
     <div if:false={project}> NO HAY PROYECTO </div>
+    
 </template>
-
-
-
-                <!-- <template key={recurso.Id}>
-                    <div class="slds-p-bottom_large slds-p-left_large" style="width:500px">
-                        <lightning-record-edit-form object-api-name="Project_Assigned_Resource__c" record-id={recurso.Id}>
-                            <lightning-messages></lightning-messages>
-                            <lightning-output-field field-name="Name"></lightning-output-field>
-                            <lightning-input-field field-name="Start_Date__c"> </lightning-input-field>
-                            <lightning-input-field field-name="End_Date__c"> </lightning-input-field>
-                            <lightning-button
-                                type="submit"
-                                name="submit"
-                                label="Assign Resource"
-                            >
-                            </lightning-button>
-                        </lightning-record-edit-form>
-                    </div>
-                </template> -->

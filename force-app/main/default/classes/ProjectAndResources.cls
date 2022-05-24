@@ -2,7 +2,7 @@ public with sharing class ProjectAndResources {
 
     @AuraEnabled(cacheable=true)
     public static Map<String,List<User>> getResourcesByRole() {
-        List<User> users = [SELECT Id, Name, Role__c FROM User WHERE Role__c != null];
+        List<User> users = [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null];
         Map<String,List<User>> resourcesByRole = new Map<String,List<User>>();
         for(User resource: users){
             if(resourcesByRole.get(resource.Role__c)!=null){
@@ -19,13 +19,18 @@ public with sharing class ProjectAndResources {
     }
 
     @AuraEnabled(cacheable=true)
+    public static Map<Id,User> getResourcesById() {
+        return new Map<Id,User>([SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null]);
+    }
+
+    @AuraEnabled(cacheable=true)
     public static List<Project__c> getProjects() {
         return [SELECT Id, Name, Start_Date__c, End_Date__c FROM Project__c];
     }
 
     @AuraEnabled(cacheable=true)
     public static List<Project_Line_Item__c> getProjectLineItems(Id projectId) {
-        return [SELECT Id, Name, Role__c, Estimated_Hours__c FROM Project_Line_Item__c WHERE Project__c =: projectId];
+        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Current_Hours__c FROM Project_Line_Item__c WHERE Project__c =: projectId];
     }
 
     @AuraEnabled(cacheable=true)
