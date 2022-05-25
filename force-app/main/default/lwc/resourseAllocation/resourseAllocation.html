@@ -1,16 +1,16 @@
 <!-- sldsValidatorIgnore -->
 <!-- style="height: 150px;"  -->
 <template>
-    <div if:true={project}>
+    <div class='tabla' if:true={project}>
         <lightning-card  variant="Narrow" icon-name="standard:account">
             <h1 slot="title">Project Name: {project.Name}</h1>
             <br>
             <div if:true={projectLineItems}>
                 <template for:each={projectLineItems} for:item="projectLineItem">
-                    <div key={projectLineItem.Id}>  
-                            <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} - Estimated Hours: {projectLineItem.Estimated_Hours__c}     - Assigned Hours: {projectLineItem.Current_Hours__c}</h1>
+                    <div key={projectLineItem.Id}  id={projectLineItem.Id}>  
+                            <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} - Estimated Hours: {projectLineItem.Estimated_Hours__c}     - Assigned Hours: {projectLineItem.Assigned_Hours__c}</h1>
                             <template if:true={projectLineItem.data1}>
-                                <div style="height: 15vh;">
+                                <div style="height: 15vh;" >
                                     <lightning-datatable
                                             key-field="resourceId"
                                             data={projectLineItem.data1}
@@ -18,7 +18,11 @@
                                             row-number-offset={rowOffset}
                                             columns={columns}
                                             onsave={handleSave}
-                                            oncancel={handleCancel}>
+                                            oncancel={handleCancel}
+                                            hide-checkbox-column=true
+                                            oncellchange={handleCellChange}
+                                            draft-values={draftValues}
+                                            >
                                     </lightning-datatable>
                                 </div>
                             </template>

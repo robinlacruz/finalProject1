@@ -25,6 +25,7 @@ export default class ResourseAllocation extends LightningElement {
     resourcesById;
     projectLineItemsByRole;
     changedFlag;
+    draftValues=[];
     
 
     
@@ -35,7 +36,7 @@ export default class ResourseAllocation extends LightningElement {
         if(data){
             if(data.length>0) this.project = data[0];
             this.projectId=this.project.Id;
-            console.log('recibimos projects: ',data);
+           // console.log('recibimos projects: ',data);
         } else if(error){
             console.log('Hubo error recibiendo projects', error);
         } else {
@@ -52,16 +53,15 @@ export default class ResourseAllocation extends LightningElement {
             let PLIarray=[];
             //console.log('antes del for de projectLineItems',data);
             for(let i=0;i<receivedPLIs.length;i++){
-                let {Id, Name, Role__c, Estimated_Hours__c,Current_Hours__c}  = receivedPLIs[i];
+                let {Id, Name, Role__c, Estimated_Hours__c,Current_Hours__c,Assigned_Hours__c}  = receivedPLIs[i];
 
                 let resources = this.getResource(receivedPLIs[i].Role__c);
-                console.log('Resources->'+JSON.stringify(resources));
+                //console.log('Resources->'+JSON.stringify(resources));
                 let data1 = [];
                 resources.forEach(element => {
                     data1.push({resourceId:element.Id,resourceName:element.Name,resourceRate:element.Rate_p_hour__c,startDate:null,endDate:null,pliId:receivedPLIs[i].Id,resourceRole:element.Role__c});
                 });
-
-                PLIarray[i] = {Id:Id,Name:Name,Role__c:Role__c,Estimated_Hours__c:Estimated_Hours__c,data1:data1,Current_Hours__c:Current_Hours__c};
+                PLIarray[i] = {Id:Id,Name:Name,Role__c:Role__c,Estimated_Hours__c:Estimated_Hours__c,data1:data1,Assigned_Hours__c:Assigned_Hours__c};
             }
             this.projectLineItems=PLIarray;
             this.projectLineItemsByRole= new Map(this.projectLineItems.map(elemento=>{
@@ -107,16 +107,15 @@ export default class ResourseAllocation extends LightningElement {
     }
 
     async refresh() {
-        console.log('dentro de refresh()');
         await refreshApex(this.changedFlag);
+        this.draftValues=[];
+        //console.log('Se ejecuto el refresh');
     }
 
     handleSave(data) {
-        
-        //console.log('los draftValues son:');
-        //console.log(JSON.parse(JSON.stringify(data.detail.draftValues)));
+
         let editedRecords = data.detail.draftValues;
-        let pliToInsert=[];
+        let parsToInsert=[];
         editedRecords.forEach(element => {
             let user = this.resourcesById[element.resourceId];
             let pli = this.projectLineItemsByRole.get(user.Role__c);
@@ -124,22 +123,21 @@ export default class ResourseAllocation extends LightningElement {
             let assignedHours = 8*businessDays;
             //console.log('assignedHours -> ',assignedHours);
             let projAssignResource = {Name:`ProjAssRes${user.Name}`, User__c:user.Id,Start_Date__c:element.startDate,End_Date__c:element.endDate ,Project_Line_Item__c:pli.Id ,Assigned_Hour__c:parseInt(assignedHours)};
-            pliToInsert.push(projAssignResource);
+            parsToInsert.push(projAssignResource);
 
         }); 
-        console.log(pliToInsert); 
-        insertPARs({PARsList: pliToInsert}).then(data=>{
-            console.log('dentro de insertPARs ->',data);
+        console.log('PrAsResToInsert -> ',parsToInsert); 
+        insertPARs({PARsList: parsToInsert}).then(data=>{
+            //console.log('dentro de insertPARs ->',data);
             this.refresh();
         })
         
-
         function getBusinessDatesCount(startDate, endDate) {
             let count = 0;
             const curDate = new Date(startDate.getTime());
             while (curDate <= endDate) {
                 const dayOfWeek = curDate.getDay();
-                if(dayOfWeek !== 0 && dayOfWeek !== 6) count++;
+                if(dayOfWeek !== 5 && dayOfWeek !== 6) count++;
                 curDate.setDate(curDate.getDate() + 1);
             }
             return count;
@@ -147,9 +145,13 @@ export default class ResourseAllocation extends LightningElement {
     }
 
     handleCancel(data) {
-        console.log('los draftValues son:');
-        console.log(JSON.parse(JSON.stringify(data.detail)));
+        console.log('se cancelo');
+        //console.log(JSON.parse(JSON.stringify(data.detail)));
     }
 
+    handleCellChange(data){
+        this.draftValues.push(data.detail.draftValues);
+        //console.log('this.draftValues es -> ',JSON.parse(JSON.stringify(this.draftValues)));
+    }
 
 }

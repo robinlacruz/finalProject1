@@ -30,7 +30,7 @@ public with sharing class ProjectAndResources {
 
     @AuraEnabled(cacheable=true)
     public static List<Project_Line_Item__c> getProjectLineItems(Id projectId) {
-        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Current_Hours__c FROM Project_Line_Item__c WHERE Project__c =: projectId];
+        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Current_Hours__c, Assigned_Hours__c FROM Project_Line_Item__c WHERE Project__c =: projectId];
     }
 
     @AuraEnabled(cacheable=true)
