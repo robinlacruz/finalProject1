@@ -307,6 +307,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Project_Line_Item__c.Assigned_Hours__c</field>
+        <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Project_Line_Item__c.Current_Hours__c</field>
         <readable>false</readable>
     </fieldPermissions>

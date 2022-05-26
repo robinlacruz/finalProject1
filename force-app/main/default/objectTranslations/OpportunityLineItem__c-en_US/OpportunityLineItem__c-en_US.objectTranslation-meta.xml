@@ -8,6 +8,5 @@
         <plural>true</plural>
         <value>OpportunityLineItems</value>
     </caseValues>
-    <gender>Feminine</gender>
-    <nameFieldLabel></nameFieldLabel>
+    <startsWith>Consonant</startsWith>
 </CustomObjectTranslation>

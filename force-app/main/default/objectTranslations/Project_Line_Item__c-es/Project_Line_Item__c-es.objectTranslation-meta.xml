@@ -9,4 +9,11 @@
         <value>Project Line Items</value>
     </caseValues>
     <gender>Neuter</gender>
+    <layouts>
+        <layout>Project Line Item Layout</layout>
+        <sections>
+            <label></label>
+            <section>Custom Links</section>
+        </sections>
+    </layouts>
 </CustomObjectTranslation>
