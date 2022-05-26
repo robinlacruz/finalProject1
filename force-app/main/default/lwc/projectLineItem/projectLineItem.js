@@ -1,9 +1,10 @@
 import { LightningElement,api,wire } from 'lwc';
-import insertPARs from '@salesforce/apex/ProjectAndResources.insertPARs';
-import getResourcesById from '@salesforce/apex/ProjectAndResources.getResourcesById';
-import getProjectLineItem from '@salesforce/apex/ProjectAndResources.getProjectLineItem';
-import getResourcesByRole from '@salesforce/apex/ProjectAndResources.getResourcesByRole';
+import insertPARs from '@salesforce/apex/ProjectResourcesHelper.insertPARs';
+import getResourcesById from '@salesforce/apex/ProjectResourcesHelper.getResourcesById';
+import getProjectLineItem from '@salesforce/apex/ProjectResourcesHelper.getProjectLineItem';
+import getResourcesByRole from '@salesforce/apex/ProjectResourcesHelper.getResourcesByRole';
 import {refreshApex} from'@salesforce/apex';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const columns = [
     { label: 'Resource Name', fieldName: 'resourceName', editable: false },
@@ -73,27 +74,39 @@ export default class ProjectLineItem extends LightningElement {
     }
 
     handleSave(data) {
-        console.log('los draftValues que llegan a handleSave son ->',JSON.parse(JSON.stringify(data.detail.draftValues)));
+        console.log('los draftValues que llegan a handleSave son --->',JSON.parse(JSON.stringify(data.detail.draftValues)));
         let editedRecords = data.detail.draftValues;
         let parsToInsert=[];
         editedRecords.forEach(element => {
             let user = this.resourcesById[element.resourceId];
-            /* let businessDays = getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate))
-            let assignedHours = 8*businessDays; */
-            //console.log('assignedHours -> ',assignedHours);
-            let projAssignResource = {Name:`ProjAssRes${user.Name}`, User__c:user.Id,Start_Date__c:element.startDate,End_Date__c:element.endDate ,Project_Line_Item__c:this.projectLineItem.Id /* ,Assigned_Hour__c:parseInt(assignedHours) */};
+            console.log('user -> ',user);
+            /* let startDate = changeDateFormat(element.startDate);
+            let endDate = changeDateFormat(element.endDate);
+            console.log('startDate ->',startDate);
+            console.log('endDate ->',endDate); */
+            let businessDays = getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate));
+            console.log('paso businessDays -> ',businessDays);
+            let totalHours = 8*businessDays;
+            console.log('paso totalHours -> ',totalHours);
+            let projAssignResource = {Name:`ProjAssRes${user.Name}`, User__c:user.Id,Start_Date__c:element.startDate,End_Date__c:element.endDate,Project_Line_Item__c:this.projectLineItem.Id ,Assigned_Hour__c:parseInt(totalHours)/* parseInt(assignedHours) */};
             parsToInsert.push(projAssignResource);
 
         }); 
-        console.log('this.draftValues es -> ',JSON.parse(JSON.stringify(this.draftValues)));
+        //console.log('this.draftValues es -> ',JSON.parse(JSON.stringify(this.draftValues)));
         console.log('PAsResToInsert -> ',parsToInsert); 
-        insertPARs({PARsList: parsToInsert}).then(data=>{
+        insertPARs({resources: parsToInsert}).then(data=>{
+            console.log('return del insertPARs -> ',data);
             this.refresh();
         }).catch(error=>{
-            console.log('ERROR ->',error);
+            console.log(error.body.message);
+            this.showErrorToast('Error de Insercion',error.body.message,'error');
         })
         
-        /* function getBusinessDatesCount(startDate, endDate) {
+        /* function changeDateFormat(date){
+            let dateArray=date.split('-');
+            return [dateArray[1],dateArray[2],dateArray[0]].join('/');
+        } */
+        function getBusinessDatesCount(startDate, endDate) {
             let count = 0;
             const curDate = new Date(startDate.getTime());
             while (curDate <= endDate) {
@@ -102,12 +115,12 @@ export default class ProjectLineItem extends LightningElement {
                 curDate.setDate(curDate.getDate() + 1);
             }
             return count;
-        } */
+        }
     }
 
     handleCellChange(data){
         //console.log('data que llega a handleCellChange ->',JSON.parse(JSON.stringify(data.detail.draftValues)));
-        console.log('dentro de handleCellChange, draftValues q trae -> ',JSON.parse(JSON.stringify(data.detail.draftValues)));
+        //console.log('dentro de handleCellChange, draftValues q trae -> ',JSON.parse(JSON.stringify(data.detail.draftValues)));
         this.draftValues.push(data.detail.draftValues);
         //console.log('this.draftValues al salir de handleCellChange->',JSON.parse(JSON.stringify(this.draftValues)));
         
@@ -116,5 +129,15 @@ export default class ProjectLineItem extends LightningElement {
     handleCancel(data) {
         console.log('se cancelo');
         //console.log(JSON.parse(JSON.stringify(data.detail)));
+    }
+
+    showErrorToast(title,message,variant) {
+        const evt = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
+            mode: 'dismissable'
+        });
+        this.dispatchEvent(evt);
     }
 }

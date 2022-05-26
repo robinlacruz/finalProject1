@@ -1,5 +1,5 @@
 import { LightningElement, wire, api } from 'lwc';
-import getProjectAndPLIs from '@salesforce/apex/ProjectAndResources.getProjectAndPLIs';
+import getProjectAndPLIs from '@salesforce/apex/ProjectResourcesHelper.getProjectAndPLIs';
 
 export default class ResourseAllocation extends LightningElement {
     project;
