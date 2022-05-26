@@ -89,6 +89,8 @@ export default class ProjectLineItem extends LightningElement {
         console.log('PAsResToInsert -> ',parsToInsert); 
         insertPARs({PARsList: parsToInsert}).then(data=>{
             this.refresh();
+        }).catch(error=>{
+            console.log('ERROR ->',error);
         })
         
         function getBusinessDatesCount(startDate, endDate) {

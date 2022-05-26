@@ -2,12 +2,8 @@
 <!-- style="height: 150px;"  -->
 <template>
     <div if:true={project}>
-        <lightning-card  variant="Narrow" icon-name="standard:account">
-            <div if:true={project.Name}>
-                <h1 slot="title">Project Name: {project.Name}</h1>
-            </div>
+        <lightning-card  variant="Narrow">
             <div if:false={project.Name}> no se recibio project.Name </div>
-            <br>
             <div if:true={project.Project_Line_Items__r}>
                 <template for:each={project.Project_Line_Items__r} for:item="projectLineItem">
                     <div key={projectLineItem.id}>

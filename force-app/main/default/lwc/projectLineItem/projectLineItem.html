@@ -1,10 +1,9 @@
 <template>
     <div if:true={projectLineItem}>  
-        <div if:true={projectLineItem.Role__c}>
-        <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} - Estimated Hours: {projectLineItem.Estimated_Hours__c}     - Assigned Hours: {projectLineItem.Assigned_Hours__c}</h1>
-        </div>
-        <template if:true={resources}>
-            <div style="min-height: 15vh;" >
+            <div if:true={projectLineItem.Role__c}>
+            <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} - Estimated Hours: {projectLineItem.Estimated_Hours__c}     - Assigned Hours: {projectLineItem.Assigned_Hours__c}</h1>
+            </div>
+            <template if:true={resources}>
                 <lightning-datatable
                         key-field="resourceId"
                         data={resources}
@@ -18,7 +17,7 @@
                         draft-values={draftValues}
                         >
                 </lightning-datatable>
-            </div>
-        </template>
+                <br>
+            </template>
     </div>
 </template>

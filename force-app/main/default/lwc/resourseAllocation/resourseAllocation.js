@@ -3,10 +3,11 @@ import getProjectAndPLIs from '@salesforce/apex/ProjectAndResources.getProjectAn
 
 export default class ResourseAllocation extends LightningElement {
     project;
-    recordId;
-    
+    @api recordId;
+
     @wire (getProjectAndPLIs,{projectId:'$recordId'})
     receivedProject(result){
+        console.log('cambio recordId');
         const {data,error} = result;
         if(data){
             this.project = data;
@@ -16,10 +17,5 @@ export default class ResourseAllocation extends LightningElement {
         } else {
             console.log('project llego undefined');
         }
-    }
-
-    connectedCallback(){
-        this.recordId='a038a00000P1efQAAR';
-        console.log('recordId es -> ',this.recordId);
     }
 }
