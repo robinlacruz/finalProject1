@@ -78,10 +78,10 @@ export default class ProjectLineItem extends LightningElement {
         let parsToInsert=[];
         editedRecords.forEach(element => {
             let user = this.resourcesById[element.resourceId];
-            let businessDays = getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate))
-            let assignedHours = 8*businessDays;
+            /* let businessDays = getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate))
+            let assignedHours = 8*businessDays; */
             //console.log('assignedHours -> ',assignedHours);
-            let projAssignResource = {Name:`ProjAssRes${user.Name}`, User__c:user.Id,Start_Date__c:element.startDate,End_Date__c:element.endDate ,Project_Line_Item__c:this.projectLineItem.Id ,Assigned_Hour__c:parseInt(assignedHours)};
+            let projAssignResource = {Name:`ProjAssRes${user.Name}`, User__c:user.Id,Start_Date__c:element.startDate,End_Date__c:element.endDate ,Project_Line_Item__c:this.projectLineItem.Id /* ,Assigned_Hour__c:parseInt(assignedHours) */};
             parsToInsert.push(projAssignResource);
 
         }); 
@@ -93,7 +93,7 @@ export default class ProjectLineItem extends LightningElement {
             console.log('ERROR ->',error);
         })
         
-        function getBusinessDatesCount(startDate, endDate) {
+        /* function getBusinessDatesCount(startDate, endDate) {
             let count = 0;
             const curDate = new Date(startDate.getTime());
             while (curDate <= endDate) {
@@ -102,7 +102,7 @@ export default class ProjectLineItem extends LightningElement {
                 curDate.setDate(curDate.getDate() + 1);
             }
             return count;
-        }
+        } */
     }
 
     handleCellChange(data){
