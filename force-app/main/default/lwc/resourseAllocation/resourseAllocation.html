@@ -1,36 +1,21 @@
 <!-- sldsValidatorIgnore -->
 <!-- style="height: 150px;"  -->
 <template>
-    <div class='tabla' if:true={project}>
+    <div if:true={project}>
         <lightning-card  variant="Narrow" icon-name="standard:account">
-            <h1 slot="title">Project Name: {project.Name}</h1>
+            <div if:true={project.Name}>
+                <h1 slot="title">Project Name: {project.Name}</h1>
+            </div>
+            <div if:false={project.Name}> no se recibio project.Name </div>
             <br>
-            <div if:true={projectLineItems}>
-                <template for:each={projectLineItems} for:item="projectLineItem">
-                    <div key={projectLineItem.Id}  id={projectLineItem.Id}>  
-                            <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} - Estimated Hours: {projectLineItem.Estimated_Hours__c}     - Assigned Hours: {projectLineItem.Assigned_Hours__c}</h1>
-                            <template if:true={projectLineItem.data1}>
-                                <div style="height: 15vh;" >
-                                    <lightning-datatable
-                                            key-field="resourceId"
-                                            data={projectLineItem.data1}
-                                            show-row-number-column
-                                            row-number-offset={rowOffset}
-                                            columns={columns}
-                                            onsave={handleSave}
-                                            oncancel={handleCancel}
-                                            hide-checkbox-column=true
-                                            oncellchange={handleCellChange}
-                                            draft-values={draftValues}
-                                            >
-                                    </lightning-datatable>
-                                </div>
-                            </template>
+            <div if:true={project.Project_Line_Items__r}>
+                <template for:each={project.Project_Line_Items__r} for:item="projectLineItem">
+                    <div key={projectLineItem.id}>
+                        <c-project-line-item pli-id={projectLineItem.Id}></c-project-line-item>
                     </div>
                 </template> 
             </div>
-            <div if:false={projectLineItems}> NO HAY PROJECT LINE ITEMS </div>
-            <div if:false={resourcesByRole}> NO SE CARGO NADA </div>
+            <div if:false={project.Project_Line_Items__r}>No se recibio project.Project_Line_Items__r</div>
         </lightning-card>
     </div>
     <div if:false={project}> NO HAY PROYECTO </div>
