@@ -33,7 +33,7 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=true)
     public static Project_Line_Item__c getProjectLineItem(Id pliId) {
-        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Current_Hours__c, Assigned_Hours__c FROM Project_Line_Item__c WHERE Id =: pliId LIMIT 1];
+        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Estimated_Amount__c, Assigned_Amount__c, Current_Hours__c, Assigned_Hours__c FROM Project_Line_Item__c WHERE Id =: pliId LIMIT 1];
     }
 
 
@@ -62,7 +62,7 @@ public with sharing class ProjectResourcesHelper {
 
      @AuraEnabled(cacheable=true)
     public static List<Project_Line_Item__c> getProjectLineItems(Id projectId) {
-        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Current_Hours__c, Assigned_Hours__c FROM Project_Line_Item__c WHERE Project__c =: projectId];
+        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Current_Hours__c, Assigned_Hours__c, Estimated_Amount__c, Assigned_Amount__c FROM Project_Line_Item__c WHERE Project__c =: projectId];
     }
     
       @AuraEnabled(cacheable=true)
@@ -81,30 +81,58 @@ public with sharing class ProjectResourcesHelper {
     }
     
     //Validations
+    //Retorna true si el proyecto pasado por parametro tiene un unico squad lead. De lo contrario retorna false
+    public static boolean hasUniqueSquadLead(Project__c project){
+        List<Id> userIds = getUserIdsOfProject(project.Id);
+        if(project.Squad_Lead__c ==null){
+            return false;
+        }    
+        else{
+            if(!userIds.contains(project.Squad_Lead__c))
+                return false;
+            return true;   
+        }
+    }
+    
+    //retorna true si el proyecto tiene asignadas la totalidad de horas requeridas por el equipo de ventas
     public static boolean projectIsFull(Project__c project){
-    	Project__c projectWithLineItems = [SELECT id, (SELECT id, Assigned_Hours__c, Estimated_Hours__c FROM Project_Line_Items__r) FROM Project__c WHERE id=:project.id];
+        Project__c projectWithLineItems = [SELECT id, (SELECT id, Assigned_Hours__c, Estimated_Hours__c FROM Project_Line_Items__r) FROM Project__c WHERE id=:project.id];
         List<Project_Line_Item__c> projectLineItemList = projectWithLineItems.Project_Line_Items__r;
        
         for(Project_Line_Item__c lineItem:projectLineItemList){
             if(lineItem.Assigned_Hours__c < lineItem.Estimated_Hours__c)
                 return false;
-            
         }
         return true;
-    
+    }
+
+    public static boolean isProfitable(Project__c project){
+            if(project.Assigned_Amount__c > project.Estimated_Amount__c)
+                return false;
+            return true;
+    }
+
+    public static List<Id> getUserIdsOfProject(Id projectId){
+        List<Project_Assigned_Resource__c> parList = [SELECT User__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId];
+        Set<Id> userIds = new Set<Id>();
+            for(Project_Assigned_Resource__c par:parList){
+                userIds.add(par.User__c);   
+            }
+        return new List<Id>(userIds); 
     }
     	
-    public static String validateAssignedDates(Id userId,Date startDate,Date endDate){
-      List<Project_Assigned_Resource__c> userAssignedResources= [SELECT id,User__c,User__r.Name,Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c 
+    public static String validateAssignedDates(Id userId,Date startDate,Date endDate,Id pliId){
+        List<Project_Assigned_Resource__c> userAssignedResources= [SELECT id,User__c,User__r.Name,Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c 
                                                                  WHERE User__c =:userId AND End_Date__c>=:Date.Today()];
-        
+        Project_Line_Item__c currentPLI = [SELECT Project__r.Start_Date__c, Project__r.End_Date__c FROM Project_Line_Item__c WHERE Id =: pliId];
         String error;
         if(startDate==null || endDate ==null){
             return 'Se deben asignar ambas fechas';
         }
 
-        if(endDate<=startDate){
-            error='La fecha de fin del proyecto no puede ser anterior o igual a la de inicio del mismo.';
+
+        if(endDate<startDate){
+            error='La fecha de fin de la asignacion no puede ser anterior a la fecha de inicio.';
             return error;
         }     
         if(endDate<Date.today() || startDate<Date.today()){
@@ -116,25 +144,30 @@ public with sharing class ProjectResourcesHelper {
 
         // Valida que las fechas no sean sabado o domingo
         
-        if(dayOfStartDate == 'Saturday' || dayOfStartDate == 'Friday'){
-                if(dayOfEndDate =='Saturday' || dayOfEndDate == 'Friday'){
+        if(dayOfStartDate == 'Saturday' || dayOfStartDate == 'Sunday'){
+                if(dayOfEndDate =='Saturday' || dayOfEndDate == 'Sunday'){
                     error='No se pueden asignar dias no laborales como fecha de termino del proyecto';
                     return error;
                 }
             error='No se pueden asignar dias no laborales como fecha de inicio del proyecto';
             return error;		
         }
+
+        Date projectStartDate = currentPLI.Project__r.Start_Date__c; 
+        Date projectEndDate = currentPLI.Project__r.End_Date__c;
         
+        if(startDate<projectStartDate || endDate>projectEndDate){
+            error='No se pueden asignar recursos fuera del rango de fechas del proyecto';
+            return error;
+        }
         
         for(Project_Assigned_Resource__c assignedResource : userAssignedResources){
             Date resourceStartDate = assignedResource.Start_Date__c; 
-            Date resourceEndDate = assignedResource.End_Date__c;
-			     
+            Date resourceEndDate = assignedResource.End_Date__c;   
             if(startDate<=resourceEndDate && endDate>=resourceStartDate){
                 error='No pueden asignarse las fechas seleccionadas porque no estan disponibles para ' + assignedResource.user__r.Name;
                 return error;
             }
-            
         }
             
 		return error;     
@@ -143,7 +176,7 @@ public with sharing class ProjectResourcesHelper {
     
     //Utilities
         public static String getDayOfWeek(Date paramDate){
-			Datetime dt = (DateTime)paramDate;
+			Datetime dt = (DateTime)paramDate.addDays(1);
         	return  dt.format('EEEE');
     }
     

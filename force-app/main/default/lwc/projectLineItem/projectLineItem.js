@@ -70,6 +70,9 @@ export default class ProjectLineItem extends LightningElement {
 
     async refresh() {
         await refreshApex(this.changedFlag);
+        setTimeout(() => {
+            eval("$A.get('e.force:refreshView').fire();");
+        }, 500);
         this.draftValues=[];
     }
 
