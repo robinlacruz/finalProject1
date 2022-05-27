@@ -34,7 +34,7 @@ export default class ProjectLineItem extends LightningElement {
             //console.log('recibimos resourcesById: ',data);
 
         } else if(error){
-            console.log('Hubo error recibiendo resourcesByRole', error);
+            console.log('Hubo error recibiendo resourcesById', error);
         }
     }
 
@@ -86,9 +86,10 @@ export default class ProjectLineItem extends LightningElement {
             console.log('endDate ->',endDate); */
             let businessDays = getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate));
             console.log('paso businessDays -> ',businessDays);
-            let totalHours = 8*businessDays;
-            console.log('paso totalHours -> ',totalHours);
-            let projAssignResource = {Name:`ProjAssRes${user.Name}`, User__c:user.Id,Start_Date__c:element.startDate,End_Date__c:element.endDate,Project_Line_Item__c:this.projectLineItem.Id ,Assigned_Hour__c:parseInt(totalHours)/* parseInt(assignedHours) */};
+            let assignedHours = 8*businessDays;
+            let assignedAmount = user.Rate_p_hour__c*assignedHours;
+            console.log('paso totalHours -> ',assignedHours);
+            let projAssignResource = {Name:`ProjAssRes${user.Name}`, User__c:user.Id,Start_Date__c:element.startDate,End_Date__c:element.endDate,Project_Line_Item__c:this.projectLineItem.Id ,Assigned_Hour__c:parseInt(assignedHours),Assigned_Amount__c:assignedAmount,Resource_Rate__c:user.Rate_p_hour__c};
             parsToInsert.push(projAssignResource);
 
         }); 

@@ -39,15 +39,18 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=false)
     public static String insertPARs(List<Project_Assigned_Resource__c>  resources){
-        system.debug('dentro de insertPARs al principio');
         List<Project_Assigned_Resource__c> resourcesList = new List<Project_Assigned_Resource__c>();
         try{
-            system.debug('dentro de insertPARs');
-            system.debug(resources);
+           
             for(Project_Assigned_Resource__c item : resources){
-              item.put('Assigned_Hour__c',getBusinessHoursCount(item.Start_Date__c,item.End_Date__c));
-              resourcesList.add(item);
+                Integer assignedHours = getBusinessHoursCount(item.Start_Date__c,item.End_Date__c);
+                Double assignedAmount = assignedHours*item.Resource_Rate__c;
+                item.put('Assigned_Hour__c',assignedHours);
+                item.put('Assigned_Amount__c',assignedAmount);
+                resourcesList.add(item);
             }
+            system.debug('dentro de insertPARs');
+            system.debug(resourcesList);
             insert resourcesList;
             return 'Operacion DML realizada correctamente';
         }
@@ -79,11 +82,11 @@ public with sharing class ProjectResourcesHelper {
     
     //Validations
     public static boolean projectIsFull(Project__c project){
-    	Project__c projectWithLineItems = [SELECT id, (SELECT id, Current_Hours__c, Estimated_Hours__c FROM Project_Line_Items__r) FROM Project__c WHERE id=:project.id];
+    	Project__c projectWithLineItems = [SELECT id, (SELECT id, Assigned_Hours__c, Estimated_Hours__c FROM Project_Line_Items__r) FROM Project__c WHERE id=:project.id];
         List<Project_Line_Item__c> projectLineItemList = projectWithLineItems.Project_Line_Items__r;
        
         for(Project_Line_Item__c lineItem:projectLineItemList){
-            if(lineItem.Current_Hours__c < lineItem.Estimated_Hours__c)
+            if(lineItem.Assigned_Hours__c < lineItem.Estimated_Hours__c)
                 return false;
             
         }
