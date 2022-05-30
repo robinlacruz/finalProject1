@@ -22,10 +22,6 @@
 	</types>
 	<types>
 		<members>*</members>
-		<name>AppMenu</name>
-	</types>
-	<types>
-		<members>*</members>
 		<name>AuraDefinitionBundle</name>
 	</types>
 	<types>

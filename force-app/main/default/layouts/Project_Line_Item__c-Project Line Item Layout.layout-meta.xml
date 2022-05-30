@@ -32,12 +32,7 @@
                 <field>Assigned_Hours__c</field>
             </layoutItems>
         </layoutColumns>
-        <layoutColumns>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>OwnerId</field>
-            </layoutItems>
-        </layoutColumns>
+      
         <style>TwoColumnsTopToBottom</style>
     </layoutSections>
     <layoutSections>
