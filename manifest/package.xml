@@ -6,10 +6,6 @@
 	</types>
 	<types>
 		<members>*</members>
-		<name>ApexComponent</name>
-	</types>
-	<types>
-		<members>*</members>
 		<name>ApexPage</name>
 	</types>
 	<types>
@@ -30,7 +26,7 @@
 	</types>
 	<types>
 		<members>*</members>
-		<name>AuthProvider</name>
+		<name>ContentAsset</name>
 	</types>
 	<types>
 		<members>*</members>
@@ -50,49 +46,6 @@
 	</types>
 	<types>
 		<members>*</members>
-		<name>CustomApplicationComponent</name>
-	</types>
-	<types>
-		<members>Account.Active__c</members>
-		<members>Opportunity.Amount__c</members>
-		<members>Opportunity.EndDate__c</members>
-		<members>Opportunity.PM__c</members>
-		<members>Opportunity.StartDate__c</members>
-		<members>OpportunityLineItem__c.Amount__c</members>
-		<members>OpportunityLineItem__c.Opportunity__c</members>
-		<members>OpportunityLineItem__c.Quantity__c</members>
-		<members>OpportunityLineItem__c.Role__c</members>
-		<members>Project_Assigned_Resource__c.Assigned_Hour__c</members>
-		<members>Project_Assigned_Resource__c.Cumulated_Cost__c</members>
-		<members>Project_Assigned_Resource__c.Current_Hours__c</members>
-		<members>Project_Assigned_Resource__c.End_Date__c</members>
-		<members>Project_Assigned_Resource__c.Project_Line_Item__c</members>
-		<members>Project_Assigned_Resource__c.Start_Date__c</members>
-		<members>Project_Assigned_Resource__c.User__c</members>
-		<members>Project_Line_Item__c.Amount__c</members>
-		<members>Project_Line_Item__c.Current_Hours__c</members>
-		<members>Project_Line_Item__c.Estimated_Hours__c</members>
-		<members>Project_Line_Item__c.Project__c</members>
-		<members>Project_Line_Item__c.Role__c</members>
-		<members>Project__c.Account__c</members>
-		<members>Project__c.Current_Amount__c</members>
-		<members>Project__c.End_Date__c</members>
-		<members>Project__c.Estimated_Amount__c</members>
-		<members>Project__c.OpportunityId__c</members>
-		<members>Project__c.Project_Manager__c</members>
-		<members>Project__c.Stage__c</members>
-		<members>Project__c.Start_Date__c</members>
-		<members>Resource_Task__c.Allocated_Hours__c</members>
-		<members>Resource_Task__c.End_Date__c</members>
-		<members>Resource_Task__c.Project_Assigned_Resource__c</members>
-		<members>Resource_Task__c.Registered_Hours__c</members>
-		<members>Resource_Task__c.Start_Date__c</members>
-		<members>User.Rate_p_hour__c</members>
-		<members>User.Role__c</members>
-		<name>CustomField</name>
-	</types>
-	<types>
-		<members>*</members>
 		<name>CustomLabels</name>
 	</types>
 	<types>
@@ -106,14 +59,9 @@
 		<members>User</members>
 		<name>CustomObject</name>
 	</types>
-	
 	<types>
 		<members>*</members>
 		<name>CustomTab</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>DuplicateRule</name>
 	</types>
 	<types>
 		<members>*</members>
@@ -134,14 +82,6 @@
 	<types>
 		<members>*</members>
 		<name>HomePageLayout</name>
-	</types>
-	<types>
-		<members>IframeWhiteListUrlSettings</members>
-		<name>IframeWhiteListUrlSettings</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>InstalledPackage</name>
 	</types>
 	<types>
 		<members>Account-Account %28Sales%29 Layout</members>
@@ -165,9 +105,7 @@
 	</types>
 	<types>
 		<members>Project_Assigned_Resource__c.All</members>
-		<members>Project_Assigned_Resource__c.All1</members>
 		<members>Project_Line_Item__c.All</members>
-		<members>Project_Line_Item__c.All1</members>
 		<members>Project__c.myProjects</members>
 		<members>Resource_Task__c.All</members>
 		<name>ListView</name>
@@ -181,13 +119,26 @@
 		<members>Project Manager</members>
 		<name>Profile</name>
 	</types>
+<!--	 -->
 	<types>
-		<members>Project_Manager_profilePasswordPolicy1653069006236</members>
-		<name>ProfilePasswordPolicy</name>
+	<members>unfiled$public/New_Report_rqs</members>
+	<members>unfiled$public/PLI_Assi_Hs_vs_Est_Hs_By_Project_m6W</members>
+	<name>Report</name>
 	</types>
 	<types>
+		<members>*</members>
+		<name>ReportType</name>
+	</types>
+	<types>
+		<members>*</members>
+		<name>ReportFolder</name>
+	</types> 
+	<types>
+		<members>*</members>
+		<name>DashboardFolder</name>
+	</types> 
+	<types>
 		<members>Admin</members>
-		<members>PM</members>
 		<members>Project_Manager</members>
 		<name>Role</name>
 	</types>
@@ -208,15 +159,15 @@
 	<types>
 		<members>*</members>
 		<name>StaticResource</name>
-	</types>
+	</types>  
 	<types>
-		<members>Opportunity</members>
-		<members>OpportunityLineItem__c</members>
-		<members>Project_Assigned_Resource__c</members>
-		<members>Project_Line_Item__c</members>
-		<members>Project__c</members>
-		<members>Resource_Task__c</members>
-		<name>TopicsForObjects</name>
-	</types>
+        <members>Opportunity</members>
+        <members>OpportunityLineItem__c</members>
+        <members>Project_Assigned_Resource__c</members>
+        <members>Project_Line_Item__c</members>
+        <members>Project__c</members>
+        <members>Resource_Task__c</members>
+        <name>TopicsForObjects</name>
+    </types>
 	<version>53.0</version>
 </Package>
