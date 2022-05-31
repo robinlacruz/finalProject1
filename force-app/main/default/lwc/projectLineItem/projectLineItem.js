@@ -3,6 +3,7 @@ import insertPARs from '@salesforce/apex/ProjectResourcesHelper.insertPARs';
 import getResourcesByIdMap from '@salesforce/apex/ProjectResourcesHelper.getResourcesByIdMap';
 import getProjectLineItem from '@salesforce/apex/ProjectResourcesHelper.getProjectLineItem';
 import getResourcesByRole from '@salesforce/apex/ProjectResourcesHelper.getResourcesByRole';
+import getResourcesByRoleAndDate from '@salesforce/apex/ProjectResourcesHelper.getResourcesByRoleAndDate';
 import {refreshApex} from'@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
@@ -15,6 +16,8 @@ const columns = [
 ];
 export default class ProjectLineItem extends LightningElement {
     @api pliId;
+    @api projectStartDate;
+    @api projectEndDate;
     columns=columns;
     rowOffset = 0;
     resourcesById;
@@ -23,8 +26,9 @@ export default class ProjectLineItem extends LightningElement {
     changedFlag;
     pliResources;
     resources;
-    @api projectStartDate;
-    @api projectEndDate;
+    startDateFilter;
+    endDateFilter;
+    
 
     @wire (getProjectLineItem,{pliId:'$pliId'})
     receivedProjectLineItem(result){    
@@ -39,7 +43,7 @@ export default class ProjectLineItem extends LightningElement {
     }
 
     getResources(role){
-        getResourcesByRole({role:role,startDate:this.projectStartDate,endDate:this.projectEndDate}).then(data=>{
+        getResourcesByRole({role:role/*  ,startDate:this.startDateFilter,endDate:this.endDateFilter */}).then(data=>{
             let resources = data;
             let data1 = [];
             resources.forEach(element => {
@@ -63,6 +67,9 @@ export default class ProjectLineItem extends LightningElement {
             eval("$A.get('e.force:refreshView').fire();");
         }, 500);
         this.draftValues=[];
+        this.startDateFilter = null;
+        this.endDateFilter = null;
+
     }
 
     handleSave(data) {
@@ -109,4 +116,34 @@ export default class ProjectLineItem extends LightningElement {
         });
         this.dispatchEvent(evt);
     }
+
+    handleChange(event){
+        if(event.target.name == 'startDateFilter'){
+            this.startDateFilter=event.target.value;
+        }else if(event.target.name == 'endDateFilter'){
+            this.endDateFilter=event.target.value;
+        }
+    }
+
+    handleFilter(){
+        if(this.startDateFilter && this.endDateFilter){
+            if(this.projectLineItem){
+                getResourcesByRoleAndDate({role:this.projectLineItem.Role__c ,startDate:this.startDateFilter,endDate:this.endDateFilter}).then(data=>{
+                    let resources = data;
+                    let data1 = [];
+                    resources.forEach(element => {
+                        data1.push({resourceId:element.Id,resourceName:element.Name,resourceRate:element.Rate_p_hour__c,startDate:null,endDate:null,pliId:this.pliId,resourceRole:element.Role__c});
+                    });
+                    this.resources = data1;
+                    console.log('recursos filtrados: ',this.resources);
+
+                }).catch(error=>{
+                    console.log('Hubo error recibiendo pliResources', error);
+                })
+            } else {console.log('No existe this.projectLineItem: ',this.projectLineItem)}
+        } else {
+            console.log('Se deben seleccionar ambas fechas para filtrar');
+        }
+    }
+
 }

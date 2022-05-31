@@ -21,14 +21,19 @@ public with sharing class ProjectResourcesHelper {
     } */
 
     @AuraEnabled(cacheable=false)
-    public static List<User> getResourcesByRole(String role, Date startDate, Date endDate) {
-        List<Project_Assigned_Resource__c> PARs = [SELECT User__c FROM Project_Assigned_Resource__c WHERE Start_Date__c >= :startDate AND End_Date__c <= :endDate];
+    public static List<User> getResourcesByRoleAndDate(String role, Date startDate, Date endDate) {
+        List<Project_Assigned_Resource__c> PARs = [SELECT User__c FROM Project_Assigned_Resource__c WHERE (End_Date__c >= :startDate AND End_Date__c <= :endDate) OR (Start_Date__c >= :startDate AND Start_Date__c <= :endDate) OR (Start_Date__c < :startDate AND End_Date__c > :endDate)];
         Set<Id> userIds = new Set<Id>();
         for (Project_Assigned_Resource__c par : PARS) {
             userIds.add(par.User__c);
         }
         return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c =: role AND Id NOT IN :userIds];
     }
+
+    @AuraEnabled(cacheable=false)
+    public static List<User> getResourcesByRole(String role) {
+        return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c =: role];
+    }    
 
     @AuraEnabled(cacheable=false)
     public static Map<Id,User> getResourcesByIdMap(List<User> resources){
