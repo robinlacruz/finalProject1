@@ -112,7 +112,10 @@
 	</types>
 	<types>
 		<members>Admin</members>
+<<<<<<< HEAD
 	<!--	<members>Project Manager</members>  -->
+=======
+>>>>>>> nicolas
 		<name>Profile</name>
 	</types>
 	<types>
