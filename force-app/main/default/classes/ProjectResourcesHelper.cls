@@ -1,5 +1,7 @@
 public with sharing class ProjectResourcesHelper {
 
+    public class My1Exception extends Exception {}
+	
     @AuraEnabled(cacheable=true)
 
     public static Map<String,List<User>> getResourcesByRoleMap() {
@@ -53,7 +55,7 @@ public with sharing class ProjectResourcesHelper {
             return 'Operacion DML realizada correctamente';
         }
         catch(DmlException e){
-            return 'Error DML' ;
+            throw new My1Exception(e.getMessage());  
         }
     }
 
