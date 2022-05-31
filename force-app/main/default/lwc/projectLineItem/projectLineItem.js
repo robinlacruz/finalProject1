@@ -17,15 +17,17 @@ export default class ProjectLineItem extends LightningElement {
     @api pliId;
     columns=columns;
     rowOffset = 0;
-    resourcesById;
+    @api resourcesById;
     draftValues=[];
     projectLineItem;
     changedFlag;
     pliResources;
     resources;
+    @api projectStartDate;
+    @api projectEndDate;
 
 
-    @wire (getResourcesById)
+    /* @wire (getResourcesById)
     receivedRescs(result){
         console.log('dentro del LWC PLI, pliId es: ',this.pliId);
         const {data,error} = result;
@@ -35,7 +37,7 @@ export default class ProjectLineItem extends LightningElement {
         } else if(error){
             console.log('Hubo error recibiendo resourcesById', error);
         }
-    }
+    } */
 
     @wire (getProjectLineItem,{pliId:'$pliId'})
     receivedProjectLineItem(result){    
@@ -50,13 +52,14 @@ export default class ProjectLineItem extends LightningElement {
     }
 
     getResources(role){
-        getResourcesByRole({role:role}).then(data=>{
+        getResourcesByRole({role:role,startDate:this.projectStartDate,endDate:this.projectEndDate}).then(data=>{
             let resources = data;
             let data1 = [];
             resources.forEach(element => {
                 data1.push({resourceId:element.Id,resourceName:element.Name,resourceRate:element.Rate_p_hour__c,startDate:null,endDate:null,pliId:this.pliId,resourceRole:element.Role__c});
             });
             this.resources = data1;
+            console.log('cambiaron los resources: ',this.resources);
         }).catch(error=>{
             console.log('Hubo error recibiendo pliResources', error);
         })

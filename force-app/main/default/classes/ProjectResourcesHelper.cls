@@ -21,9 +21,14 @@ public with sharing class ProjectResourcesHelper {
         return resourcesByRole;
     }
 
-    @AuraEnabled(cacheable=true)
-    public static List<User> getResourcesByRole(String role) {
-        return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c =: role];
+    @AuraEnabled(cacheable=false)
+    public static List<User> getResourcesByRole(String role, Date startDate, Date endDate) {
+        List<Project_Assigned_Resource__c> PARs = [SELECT User__c FROM Project_Assigned_Resource__c WHERE Start_Date__c >= :startDate AND End_Date__c <= :endDate];
+        Set<Id> userIds = new Set<Id>();
+        for (Project_Assigned_Resource__c par : PARS) {
+            userIds.add(par.User__c);
+        }
+        return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c =: role AND Id NOT IN :userIds];
     }
 
     @AuraEnabled(cacheable=true)
@@ -71,9 +76,25 @@ public with sharing class ProjectResourcesHelper {
     }
     
      @AuraEnabled(cacheable=true)
-    public static Map<Id,User> getResourcesById() {
-        return new Map<Id,User>([SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null]);
+    public static Map<Id,User> getResourcesById(Date startDate, Date endDate) {
+        system.debug(startDate);
+        system.debug(endDate);
+        List<Project_Assigned_Resource__c> PARs = [SELECT User__c FROM Project_Assigned_Resource__c WHERE Start_Date__c >= :startDate AND End_Date__c <= :endDate];
+        Set<Id> userIds = new Set<Id>();
+        for (Project_Assigned_Resource__c par : PARS) {
+            userIds.add(par.User__c);
+        }
+        system.debug('userIds: ');
+        system.debug(userIds);
+        return new Map<Id,User>([SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null AND Id NOT IN :userIds]);
     }
+
+    /* @AuraEnabled(cacheable=true)
+    public static Map<Id,User> getResourcesById(Date startDate, Date endDate) {
+        return new Map<Id,User>([SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null AND (SELECT Start_Date__c, End_Date__c FROM Project_Assigned_Resources__r WHERE Start_Date__c >= :startDate AND End_Date__c <= :endDate).size()==0]);
+    } */
+
+
 
     @AuraEnabled(cacheable=true)
     public static List<Project_Assigned_Resource__c> getProjectAssignedResources(Id projectId) {
