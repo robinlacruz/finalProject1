@@ -7,7 +7,7 @@
             <div if:true={project.Project_Line_Items__r}>
                 <template for:each={project.Project_Line_Items__r} for:item="projectLineItem">
                     <div key={projectLineItem.id}>
-                        <c-project-line-item pli-id={projectLineItem.Id}></c-project-line-item>
+                        <c-project-line-item pli-id={projectLineItem.Id} project-start-date={project.Start_Date__c} project-end-date={project.End_Date__c}></c-project-line-item>
                     </div>
                 </template> 
             </div>

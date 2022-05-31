@@ -1,6 +1,6 @@
 import { LightningElement,api,wire } from 'lwc';
 import insertPARs from '@salesforce/apex/ProjectResourcesHelper.insertPARs';
-import getResourcesById from '@salesforce/apex/ProjectResourcesHelper.getResourcesById';
+import getResourcesByIdMap from '@salesforce/apex/ProjectResourcesHelper.getResourcesByIdMap';
 import getProjectLineItem from '@salesforce/apex/ProjectResourcesHelper.getProjectLineItem';
 import getResourcesByRole from '@salesforce/apex/ProjectResourcesHelper.getResourcesByRole';
 import {refreshApex} from'@salesforce/apex';
@@ -23,19 +23,8 @@ export default class ProjectLineItem extends LightningElement {
     changedFlag;
     pliResources;
     resources;
-
-
-    @wire (getResourcesById)
-    receivedRescs(result){
-        console.log('dentro del LWC PLI, pliId es: ',this.pliId);
-        const {data,error} = result;
-        if(data){
-            this.resourcesById=data;
-
-        } else if(error){
-            console.log('Hubo error recibiendo resourcesById', error);
-        }
-    }
+    @api projectStartDate;
+    @api projectEndDate;
 
     @wire (getProjectLineItem,{pliId:'$pliId'})
     receivedProjectLineItem(result){    
@@ -50,13 +39,19 @@ export default class ProjectLineItem extends LightningElement {
     }
 
     getResources(role){
-        getResourcesByRole({role:role}).then(data=>{
+        getResourcesByRole({role:role,startDate:this.projectStartDate,endDate:this.projectEndDate}).then(data=>{
             let resources = data;
             let data1 = [];
             resources.forEach(element => {
                 data1.push({resourceId:element.Id,resourceName:element.Name,resourceRate:element.Rate_p_hour__c,startDate:null,endDate:null,pliId:this.pliId,resourceRole:element.Role__c});
             });
             this.resources = data1;
+            getResourcesByIdMap({resources:resources}).then(data2=>{
+                console.log('resourcesByIdMap ->',data2);
+                this.resourcesById=data2;
+            }).catch(error=>{
+                console.log('Hubo error en la funcion getResourcesByIdMap ',error);
+            })
         }).catch(error=>{
             console.log('Hubo error recibiendo pliResources', error);
         })
