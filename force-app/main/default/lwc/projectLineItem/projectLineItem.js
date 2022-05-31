@@ -28,6 +28,7 @@ export default class ProjectLineItem extends LightningElement {
     resources;
     startDateFilter;
     endDateFilter;
+    filterFlag = false;
     
 
     @wire (getProjectLineItem,{pliId:'$pliId'})
@@ -69,6 +70,7 @@ export default class ProjectLineItem extends LightningElement {
         this.draftValues=[];
         this.startDateFilter = null;
         this.endDateFilter = null;
+        this.filterFlag = false;
 
     }
 
@@ -79,7 +81,7 @@ export default class ProjectLineItem extends LightningElement {
             let assignedHours = 8 * getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate));
             let assignedAmount = user.Rate_p_hour__c*assignedHours;
             return {
-                Name:`ProjAssRes${user.Name}`, 
+                Name:`${user.Role__c} - ${user.Name}`, 
                 User__c:user.Id,
                 Start_Date__c:element.startDate,
                 End_Date__c:element.endDate,
@@ -128,6 +130,7 @@ export default class ProjectLineItem extends LightningElement {
     handleFilter(){
         if(this.startDateFilter && this.endDateFilter){
             if(this.projectLineItem){
+                this.filterFlag = true;
                 getResourcesByRoleAndDate({role:this.projectLineItem.Role__c ,startDate:this.startDateFilter,endDate:this.endDateFilter}).then(data=>{
                     let resources = data;
                     let data1 = [];
@@ -144,6 +147,12 @@ export default class ProjectLineItem extends LightningElement {
         } else {
             console.log('Se deben seleccionar ambas fechas para filtrar');
         }
+    }
+
+    handleCancelFilter(){
+        this.startDateFilter = null;
+        this.endDateFilter = null;
+        if(this.filterFlag) this.getResources(this.projectLineItem.Role__c);
     }
 
 }
