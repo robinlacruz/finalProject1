@@ -50,6 +50,13 @@
                 <elementReference>CreateProjectLineItems.Name</elementReference>
             </value>
         </assignmentItems>
+        <assignmentItems>
+            <assignToReference>ProjectLineItem1.Estimated_Amount__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>CreateProjectLineItems.Amount__c</elementReference>
+            </value>
+        </assignmentItems>
         <connector>
             <targetReference>AddProjRelItemToTheList</targetReference>
         </connector>
@@ -132,6 +139,12 @@
         </inputAssignments>
         <inputAssignments>
             <field>OwnerId</field>
+            <value>
+                <elementReference>$Record.PM__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Project_Manager__c</field>
             <value>
                 <elementReference>$Record.PM__c</elementReference>
             </value>
