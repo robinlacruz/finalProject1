@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>54.0</apiVersion>
+    <decisions>
+        <name>CheckProjectStartDate</name>
+        <label>CheckProjectStartDate</label>
+        <locationX>182</locationX>
+        <locationY>276</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>ChangeProjectStatus</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Start_Date__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>$Flow.CurrentDate</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>ProjectStageInProgress</targetReference>
+            </connector>
+            <label>ChangeProjectStatus</label>
+        </rules>
+    </decisions>
+    <interviewLabel>Change Project Status to In Progress {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Change Project Status to In Progress</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>attempts to change the project stage from &apos;pre-kickoff&apos; to &apos;In-progress&apos;</description>
+        <name>ProjectStageInProgress</name>
+        <label>ProjectStageInProgress</label>
+        <locationX>50</locationX>
+        <locationY>396</locationY>
+        <inputAssignments>
+            <field>Stage__c</field>
+            <value>
+                <stringValue>In progress</stringValue>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>CheckProjectStartDate</targetReference>
+        </connector>
+        <object>Project__c</object>
+        <schedule>
+            <frequency>Daily</frequency>
+            <startDate>2022-05-27</startDate>
+            <startTime>01:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

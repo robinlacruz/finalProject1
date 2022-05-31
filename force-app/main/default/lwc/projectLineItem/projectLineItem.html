@@ -1,0 +1,23 @@
+<template>
+    <div if:true={projectLineItem}>  
+            <div if:true={projectLineItem.Role__c}>
+            <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} </h1>
+            <h2 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1em;">&nbsp;&nbsp;&nbsp;Estimated Hours: {projectLineItem.Estimated_Hours__c} - Assigned Hours: {projectLineItem.Assigned_Hours__c} </h2>
+            <h2 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1em;">&nbsp;&nbsp;&nbsp;Estimated Amount: {projectLineItem.Estimated_Amount__c}     - Assigned Amount: {projectLineItem.Assigned_Amount__c}</h2>
+            </div>
+            <template if:true={resources}>
+                <lightning-datatable
+                        key-field="resourceId"
+                        data={resources}
+                        show-row-number-column
+                        row-number-offset={rowOffset}
+                        columns={columns}
+                        onsave={handleSave}
+                        hide-checkbox-column=true
+                        draft-values={draftValues}
+                        >
+                </lightning-datatable>
+                <br>
+            </template>
+    </div>
+</template>

@@ -1,0 +1,19 @@
+<!-- sldsValidatorIgnore -->
+<!-- style="height: 150px;"  -->
+<template>
+    <div if:true={project}>
+        <lightning-card  variant="Narrow">
+            <div if:false={project.Name}> no se recibio project.Name </div>
+            <div if:true={project.Project_Line_Items__r}>
+                <template for:each={project.Project_Line_Items__r} for:item="projectLineItem">
+                    <div key={projectLineItem.id}>
+                        <c-project-line-item pli-id={projectLineItem.Id}></c-project-line-item>
+                    </div>
+                </template> 
+            </div>
+            <div if:false={project.Project_Line_Items__r}>No se recibio project.Project_Line_Items__r</div>
+        </lightning-card>
+    </div>
+    <div if:false={project}> NO HAY PROYECTO </div>
+    
+</template>
