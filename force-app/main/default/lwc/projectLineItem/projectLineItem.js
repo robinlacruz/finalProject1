@@ -1,6 +1,6 @@
 import { LightningElement,api,wire } from 'lwc';
 import insertPARs from '@salesforce/apex/ProjectResourcesHelper.insertPARs';
-import getResourcesById from '@salesforce/apex/ProjectResourcesHelper.getResourcesById';
+import getResourcesByIdMap from '@salesforce/apex/ProjectResourcesHelper.getResourcesByIdMap';
 import getProjectLineItem from '@salesforce/apex/ProjectResourcesHelper.getProjectLineItem';
 import getResourcesByRole from '@salesforce/apex/ProjectResourcesHelper.getResourcesByRole';
 import {refreshApex} from'@salesforce/apex';
@@ -17,7 +17,7 @@ export default class ProjectLineItem extends LightningElement {
     @api pliId;
     columns=columns;
     rowOffset = 0;
-    @api resourcesById;
+    resourcesById;
     draftValues=[];
     projectLineItem;
     changedFlag;
@@ -25,19 +25,6 @@ export default class ProjectLineItem extends LightningElement {
     resources;
     @api projectStartDate;
     @api projectEndDate;
-
-
-    /* @wire (getResourcesById)
-    receivedRescs(result){
-        console.log('dentro del LWC PLI, pliId es: ',this.pliId);
-        const {data,error} = result;
-        if(data){
-            this.resourcesById=data;
-
-        } else if(error){
-            console.log('Hubo error recibiendo resourcesById', error);
-        }
-    } */
 
     @wire (getProjectLineItem,{pliId:'$pliId'})
     receivedProjectLineItem(result){    
@@ -59,7 +46,12 @@ export default class ProjectLineItem extends LightningElement {
                 data1.push({resourceId:element.Id,resourceName:element.Name,resourceRate:element.Rate_p_hour__c,startDate:null,endDate:null,pliId:this.pliId,resourceRole:element.Role__c});
             });
             this.resources = data1;
-            console.log('cambiaron los resources: ',this.resources);
+            getResourcesByIdMap({resources:resources}).then(data2=>{
+                console.log('resourcesByIdMap ->',data2);
+                this.resourcesById=data2;
+            }).catch(error=>{
+                console.log('Hubo error en la funcion getResourcesByIdMap ',error);
+            })
         }).catch(error=>{
             console.log('Hubo error recibiendo pliResources', error);
         })

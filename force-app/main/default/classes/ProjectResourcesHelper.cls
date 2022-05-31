@@ -2,8 +2,7 @@ public with sharing class ProjectResourcesHelper {
 
     public class My1Exception extends Exception {}
 	
-    @AuraEnabled(cacheable=true)
-
+    /* @AuraEnabled(cacheable=true)
     public static Map<String,List<User>> getResourcesByRoleMap() {
         List<User> users = [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null];
         Map<String,List<User>> resourcesByRole = new Map<String,List<User>>();
@@ -19,7 +18,7 @@ public with sharing class ProjectResourcesHelper {
             }
         }
         return resourcesByRole;
-    }
+    } */
 
     @AuraEnabled(cacheable=false)
     public static List<User> getResourcesByRole(String role, Date startDate, Date endDate) {
@@ -31,9 +30,14 @@ public with sharing class ProjectResourcesHelper {
         return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c =: role AND Id NOT IN :userIds];
     }
 
+    @AuraEnabled(cacheable=false)
+    public static Map<Id,User> getResourcesByIdMap(List<User> resources){
+        return new Map<Id,User>(resources);
+    }
+
     @AuraEnabled(cacheable=true)
     public static Project__c getProjectAndPLIs(Id projectId) {
-        return [SELECT Id, Name, Start_Date__c, End_Date__c, (SELECT Id, Name, Role__c, Estimated_Hours__c, Current_Hours__c, Assigned_Hours__c FROM Project_Line_Items__r) FROM Project__c WHERE Project__c.Id =: projectId LIMIT 1];
+        return [SELECT Id, Name, Start_Date__c, End_Date__c, (SELECT Id FROM Project_Line_Items__r) FROM Project__c WHERE Project__c.Id =: projectId LIMIT 1];
     }
 
     @AuraEnabled(cacheable=true)
@@ -65,17 +69,17 @@ public with sharing class ProjectResourcesHelper {
     }
 
 
-     @AuraEnabled(cacheable=true)
+    /*  @AuraEnabled(cacheable=true)
     public static List<Project_Line_Item__c> getProjectLineItems(Id projectId) {
         return [SELECT Id, Name, Role__c, Estimated_Hours__c, Current_Hours__c, Assigned_Hours__c, Estimated_Amount__c, Assigned_Amount__c FROM Project_Line_Item__c WHERE Project__c =: projectId];
-    }
+    } */
     
-      @AuraEnabled(cacheable=true)
+    /*   @AuraEnabled(cacheable=true)
     public static List<Project__c> getProjects() {
         return [SELECT Id, Name, Start_Date__c, End_Date__c FROM Project__c];
-    }
+    } */
     
-     @AuraEnabled(cacheable=true)
+    /*  @AuraEnabled(cacheable=true)
     public static Map<Id,User> getResourcesById(Date startDate, Date endDate) {
         system.debug(startDate);
         system.debug(endDate);
@@ -87,7 +91,7 @@ public with sharing class ProjectResourcesHelper {
         system.debug('userIds: ');
         system.debug(userIds);
         return new Map<Id,User>([SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null AND Id NOT IN :userIds]);
-    }
+    } */
 
     /* @AuraEnabled(cacheable=true)
     public static Map<Id,User> getResourcesById(Date startDate, Date endDate) {
@@ -96,10 +100,10 @@ public with sharing class ProjectResourcesHelper {
 
 
 
-    @AuraEnabled(cacheable=true)
+    /* @AuraEnabled(cacheable=true)
     public static List<Project_Assigned_Resource__c> getProjectAssignedResources(Id projectId) {
         return [SELECT Id, User__c, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId];
-    }
+    } */
     
     //Validations
     //Retorna true si el proyecto pasado por parametro tiene un unico squad lead. De lo contrario retorna false
