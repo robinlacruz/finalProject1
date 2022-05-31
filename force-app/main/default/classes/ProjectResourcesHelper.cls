@@ -120,23 +120,42 @@ public with sharing class ProjectResourcesHelper {
             }
         return new List<Id>(userIds); 
     }
-    	
-    public static String validateAssignedDates(Id userId,Date startDate,Date endDate,Id pliId){
-        List<Project_Assigned_Resource__c> userAssignedResources= [SELECT id,User__c,User__r.Name,Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c 
-                                                                 WHERE User__c =:userId AND End_Date__c>=:Date.Today()];
-        Project_Line_Item__c currentPLI = [SELECT Project__r.Start_Date__c, Project__r.End_Date__c FROM Project_Line_Item__c WHERE Id =: pliId];
+
+    //item.user__c,item.Start_Date__c,item.End_Date__c,item.Project_Line_Item__c
+    public static void validatePARs(List<Project_Assigned_Resource__c> PARsList){
+
+        Set<Id> PLIIds = new Set<Id>();
+        Set<Id> resourcesIds = new Set<Id>();
+        for (Project_Assigned_Resource__c PAR : PARsList) {
+            PLIIds.add(PAR.Project_Line_Item__c);
+            resourcesIds.add(PAR.User__c);
+        }
+        Map<Id,User> PARsByUserId = new Map<Id,User>([SELECT Id, Name, (SELECT id,User__c,User__r.Name,Start_Date__c,End_Date__c FROM Project_Assigned_Resources__r WHERE End_Date__c>=:Date.Today()) FROM User WHERE Id IN :resourcesIds]);
+        Map<Id,Project_Line_Item__c> PLIsByPLIId = new Map<Id,Project_Line_Item__c>([SELECT Project__r.Start_Date__c, Project__r.End_Date__c FROM Project_Line_Item__c WHERE Id IN :PLIIds]);
+        for(Project_Assigned_Resource__c item :PARsList){
+            Project_Line_Item__c currentPLI = PLIsByPLIId.get(item.Project_Line_Item__c);
+            User UserPARs = PARsByUserId.get(item.User__c);
+            List<Project_Assigned_Resource__c> PARs = UserPARs.Project_Assigned_Resources__r;
+            
+            String error = ProjectResourcesHelper.validateAssignedDates(UserPARS.Name, item.Start_Date__c,item.End_Date__c,currentPLI,PARs);
+            if( error!= null)
+                item.addError(error);
+          }
+    
+    }
+    public static String validateAssignedDates(String resourceName, Date startDate,Date endDate,Project_Line_Item__c currentPLI,List<Project_Assigned_Resource__c> userAssignedResources){
         String error;
         if(startDate==null || endDate ==null){
-            return 'Se deben asignar ambas fechas';
+            return 'Se deben asignar ambas fechas para '+resourceName;
         }
 
 
         if(endDate<startDate){
-            error='La fecha de fin de la asignacion no puede ser anterior a la fecha de inicio.';
+            error='La fecha de fin de la asignacion no puede ser anterior a la fecha de inicio para '+resourceName;
             return error;
         }     
         if(endDate<Date.today() || startDate<Date.today()){
-            error='Las fechas de inicio y fin del proyecto no pueden ser fechas pasadas';
+            error='Las fechas de inicio y fin del proyecto no pueden ser fechas pasadas para '+resourceName;
             return error;
         }
 		String dayOfStartDate = getDayOfWeek(startDate);
@@ -146,18 +165,18 @@ public with sharing class ProjectResourcesHelper {
         
         if(dayOfStartDate == 'Saturday' || dayOfStartDate == 'Sunday'){
                 if(dayOfEndDate =='Saturday' || dayOfEndDate == 'Sunday'){
-                    error='No se pueden asignar dias no laborales como fecha de termino del proyecto';
+                    error='No se pueden asignar dias no laborales como fecha de termino del proyecto para '+resourceName ;
                     return error;
                 }
-            error='No se pueden asignar dias no laborales como fecha de inicio del proyecto';
+            error='No se pueden asignar dias no laborales como fecha de inicio del proyecto para '+resourceName;
             return error;		
         }
 
         Date projectStartDate = currentPLI.Project__r.Start_Date__c; 
         Date projectEndDate = currentPLI.Project__r.End_Date__c;
-        
+
         if(startDate<projectStartDate || endDate>projectEndDate){
-            error='No se pueden asignar recursos fuera del rango de fechas del proyecto';
+            error='No se pueden asignar fechas fuera del rango de tiempo del proyecto para '+resourceName;
             return error;
         }
         
