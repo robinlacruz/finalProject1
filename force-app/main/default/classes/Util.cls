@@ -5,7 +5,7 @@ public with sharing class Util {
         return  dt.format('EEEE');
     }
 
-    public static Integer getBusinessHoursCount(Date startDate, Date endDate){
+    public static Integer getBusinessDatesCount(Date startDate, Date endDate){
         Integer count = 0;
         Date curDate = startDate;
         while (curDate <= endDate) {
@@ -13,7 +13,7 @@ public with sharing class Util {
             if(getDayOfWeek(curDate) != 'Friday' && getDayOfWeek(curDate) != 'Saturday') count++;
             curDate = curDate.addDays(1);
         }
-        return count* 8;
+        return count;
     }
 
 }
