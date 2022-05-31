@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Assigned_Amount__c</fullName>
+    <description>Estimated project cost based on current assigned hours per resource</description>
+    <externalId>false</externalId>
+    <label>Assigned Amount</label>
+    <summarizedField>Project_Line_Item__c.Assigned_Amount__c</summarizedField>
+    <summaryForeignKey>Project_Line_Item__c.Project__c</summaryForeignKey>
+    <summaryOperation>sum</summaryOperation>
+    <trackTrending>false</trackTrending>
+    <type>Summary</type>
+</CustomField>

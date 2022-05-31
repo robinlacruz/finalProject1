@@ -1,29 +1,25 @@
 trigger ProjectTrigger on Project__c (before update) {
-
+	
     for(Project__c proj : trigger.new){
         if(proj.Stage__c != 'Pre-Kickoff'){
-            Boolean flag = true;
-            if(!ProjectResourcesValidations.projectIsFull(proj)){
+         
+            if(!ProjectResourcesHelper.projectIsFull(proj)){
                 String error = 'El proyecto debe tener todas las horas asignadas para cambiar su estado a In progress';
-                system.debug(proj.id);
-                EmailHelper.sendEmail(proj.id, error);
-                system.debug(proj.id);
+                //EmailHelper.sendEmail(proj, error);
                 proj.addError(error);
-                flag=false;
                 
             }
 
-            if(!ProjectResourcesValidations.isProfitable(proj) && flag){
+            if(!ProjectResourcesHelper.isProfitable(proj)){
                 String error = 'El proyecto debe ser rentable para cambiar su estado a In progress ';
-                EmailHelper.sendEmail(proj.id, error);
+                //EmailHelper.sendEmail(proj, error);
                 proj.addError(error);
-                flag = false;
 
             }
 
-            if(!ProjectResourcesValidations.hasUniqueSquadLead(proj) && flag){
+            if(!ProjectResourcesHelper.hasUniqueSquadLead(proj)){
                 String error = 'El proyecto debe tener asignado un Squad Lead perteneciente al proyecto para cambiar su estado a In progress';
-                EmailHelper.sendEmail(proj.id, error);
+                //EmailHelper.sendEmail(proj, error);
                 proj.addError(error);
             }
         } 

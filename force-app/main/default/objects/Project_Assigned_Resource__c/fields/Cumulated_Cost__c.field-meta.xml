@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Assigned_Amount__c</fullName>
-    <description>The cost of using this resource for the range of dates selected</description>
+    <fullName>Cumulated_Cost__c</fullName>
     <externalId>false</externalId>
-    <label>Assigned Amount</label>
+    <label>Cumulated Cost</label>
     <precision>18</precision>
     <required>false</required>
     <scale>0</scale>

@@ -8,6 +8,7 @@
     <columns>CORE.PROFILE.NAME</columns>
     <columns>Role__c</columns>
     <columns>Rate_p_hour__c</columns>
+    <columns>CORE.PROFILE.USERTYPE</columns>
     <filterScope>Everything</filterScope>
     <label>All Users</label>
 </ListView>

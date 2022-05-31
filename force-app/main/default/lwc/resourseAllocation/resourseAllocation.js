@@ -7,6 +7,7 @@ export default class ResourseAllocation extends LightningElement {
 
     @wire (getProjectAndPLIs,{projectId:'$recordId'})
     receivedProject(result){
+        console.log('cambio recordId');
         const {data,error} = result;
         if(data){
             this.project = data;
