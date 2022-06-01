@@ -1,7 +1,6 @@
 public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=true)
-
     public static Map<String,List<User>> getResourcesByRoleMap() {
         List<User> users = [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null];
         Map<String,List<User>> resourcesByRole = new Map<String,List<User>>();
