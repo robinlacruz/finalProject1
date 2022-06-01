@@ -1,5 +1,6 @@
 @isTest
 public with sharing class TestDataFactory {
+
     public static List<User> createUsers(){
 
         Profile p = [SELECT Id FROM Profile WHERE Name='Standard User']; 
@@ -16,19 +17,19 @@ public with sharing class TestDataFactory {
                 Role__c = Math.mod(i,2) == 0 ? 'Architect': Math.mod(i,5) == 0 ? 'Consultant' : 'Developer');      
             userList.add(u);
          }
-    insert(userList);
+        insert(userList);
         return userList;
     }
 
     public static List<Project_Assigned_Resource__c> createPAR (List<User> userList){
         //
         List<Project_Assigned_Resource__c> PARs = new List<Project_Assigned_Resource__c>();
-        Date startDate;
-        Date startDateP = Date.newInstance(2022, 1, 1);
-        Date endDateP = Date.newInstance(2022, 12, 31);
+        Date startDateP = Date.today().addDays(30);
+        Date startDate = startDateP;
+        Date endDateP = startDateP.addDays(5000);
         Account acc = new Account(Name= 'Acc name');
         insert acc;
-        Opportunity opp = new Opportunity(Name = 'opp1', StageName= 'Closed', CloseDate = Date.newInstance(2022, 1, 1), EndDate__c = endDateP, StartDate__c = startDateP);
+        Opportunity opp = new Opportunity(Name = 'opp1', StageName= 'Closed', CloseDate = Date.today(), EndDate__c = endDateP, StartDate__c = startDateP);
         insert opp;
         Project__c proj = new Project__c(Account__c = acc.id, End_Date__c = endDateP, Estimated_Amount__c = 4000, OpportunityId__c= opp.id,Stage__c = 'Pre-Kickoff',Start_Date__c = startDateP);
         insert proj;
@@ -39,20 +40,20 @@ public with sharing class TestDataFactory {
         insert lineCon;
         insert lineArch;
 
-        for(User u : userList){
-            startDate = Date.newInstance(2022, 1,12);
+        for(Integer j=0;j<userList.size();j++/* User u : userList */){
             for(Integer i = 0; i<18; i++){
                 Project_Assigned_Resource__c par = new Project_Assigned_Resource__c(
-                    Start_Date__c = startDate.addDays(i),
-                    End_Date__c = startDate.addDays(i+10),
-                    User__c = u.id,
-                    Project_Line_Item__c = u.role__c == 'Developer'? lineDev.id : u.role__c == 'Consultant' ? lineCon.id : lineArch.id,
+                    Start_Date__c = startDate,
+                    End_Date__c = startDate.addDays(10),
+                    User__c = userList[j].Id,
+                    Project_Line_Item__c = userList[j].Role__c == 'Developer'? lineDev.Id : userList[j].Role__c == 'Consultant' ? lineCon.Id : lineArch.Id,
                     Assigned_Hour__c = 1,
                     Resource_Rate__c = 2
                 );
                 startDate.addDays(11);
                 PARs.add(par);
             }
+            startDate=Date.today().addDays((j+1)*30);
         }
         insert PARs;
         return PARs;

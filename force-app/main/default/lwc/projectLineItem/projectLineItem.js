@@ -29,6 +29,7 @@ export default class ProjectLineItem extends LightningElement {
     startDateFilter;
     endDateFilter;
     filterFlag = false;
+    draftValuesMap={};
     
 
     @wire (getProjectLineItem,{pliId:'$pliId'})
@@ -78,7 +79,7 @@ export default class ProjectLineItem extends LightningElement {
         this.draftValues = data.detail.draftValues;
         const parsToInsert= data.detail.draftValues.map(element => {
             let user = this.resourcesById[element.resourceId];
-            let assignedHours = 8 * getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate));
+            let assignedHours = 8 * this.getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate));
             let assignedAmount = user.Rate_p_hour__c*assignedHours;
             return {
                 Name:`${user.Role__c} - ${user.Name}`, 
@@ -97,16 +98,17 @@ export default class ProjectLineItem extends LightningElement {
             this.showErrorToast('Error de Insercion',error.body.message,'error');
         })
         
-        function getBusinessDatesCount(startDate, endDate) {
-            let count = 0;
-            const curDate = new Date(startDate.getTime());
-            while (curDate <= endDate) {
-                const dayOfWeek = curDate.getDay();
-                if(dayOfWeek !== 5 && dayOfWeek !== 6) count++;
-                curDate.setDate(curDate.getDate() + 1);
-            }
-            return count;
+    }
+
+    getBusinessDatesCount(startDate, endDate) {
+        let count = 0;
+        const curDate = new Date(startDate.getTime());
+        while (curDate <= endDate) {
+            const dayOfWeek = curDate.getDay();
+            if(dayOfWeek !== 5 && dayOfWeek !== 6) count++;
+            curDate.setDate(curDate.getDate() + 1);
         }
+        return count;
     }
 
     showErrorToast(title,message,variant) {
@@ -119,7 +121,7 @@ export default class ProjectLineItem extends LightningElement {
         this.dispatchEvent(evt);
     }
 
-    handleChange(event){
+    handleChangeFilter(event){
         if(event.target.name == 'startDateFilter'){
             this.startDateFilter=event.target.value;
         }else if(event.target.name == 'endDateFilter'){
@@ -128,9 +130,11 @@ export default class ProjectLineItem extends LightningElement {
     }
 
     handleFilter(){
-
+        
         if(this.startDateFilter && this.endDateFilter){
-            if(this.projectLineItem){
+            if(this.startDateFilter > this.endDateFilter){
+                this.showErrorToast('Error de Filtrado','La fecha inicial debe ser menor o igual a la fecha final','error');
+            } else if(this.projectLineItem){
                 this.filterFlag = true;
                 getResourcesByRoleAndDate({role:this.projectLineItem.Role__c ,startDate:this.startDateFilter,endDate:this.endDateFilter}).then(data=>{
                     let resources = data;
@@ -155,5 +159,4 @@ export default class ProjectLineItem extends LightningElement {
         this.endDateFilter = null;
         if(this.filterFlag) this.getResources(this.projectLineItem.Role__c);
     }
-
 }

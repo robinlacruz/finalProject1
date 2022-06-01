@@ -107,6 +107,10 @@
 		<name>ListView</name>
 	</types>
 	<types>
+        <members>*</members>
+        <name>PathAssistant</name>
+    </types>
+	<types>
 		<members>*</members>
 		<name>PermissionSet</name>
 	</types>
@@ -141,6 +145,7 @@
 		<members>Opportunity</members>
 		<members>Picklist</members>
 		<members>Sharing</members>
+		<members>PathAssistant</members>
 		<name>Settings</name>
 	</types>
 	<types>

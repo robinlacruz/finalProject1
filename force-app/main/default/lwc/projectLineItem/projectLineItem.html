@@ -11,12 +11,12 @@
                 <lightning-layout>
                     <lightning-layout-item padding="horizontal-small">
                         <div class="header-column">
-                            <lightning-input type="date" name="startDateFilter" label="Start Date Filter" value={startDateFilter} onchange={handleChange} placeholder="Start Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
+                            <lightning-input type="date" name="startDateFilter" label="Start Date Filter" value={startDateFilter} onchange={handleChangeFilter} placeholder="Start Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
                         </div>
                     </lightning-layout-item>      
                     <lightning-layout-item padding="horizontal-small">
                         <div class="header-column">
-                            <lightning-input type="date" name="endDateFilter" label="End Date Filter" value={endDateFilter} onchange={handleChange} placeholder="End Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
+                            <lightning-input type="date" name="endDateFilter" label="End Date Filter" value={endDateFilter} onchange={handleChangeFilter} placeholder="End Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
                         </div>
                     </lightning-layout-item>
                     <lightning-layout-item padding="horizontal-small">
