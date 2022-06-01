@@ -128,7 +128,6 @@ export default class ProjectLineItem extends LightningElement {
     }
 
     handleFilter(){
-
         if(this.startDateFilter && this.endDateFilter){
             if(this.projectLineItem){
                 this.filterFlag = true;
@@ -146,7 +145,7 @@ export default class ProjectLineItem extends LightningElement {
                 })
             } else {console.log('No existe this.projectLineItem: ',this.projectLineItem)}
         } else {
-            this.showErrorToast('Error de Filtrado','Se deben ingresar ambas fechas para poder filtrar','error');
+            console.log('Se deben seleccionar ambas fechas para filtrar');
         }
     }
 
