@@ -145,6 +145,7 @@
 		<members>Opportunity</members>
 		<members>Picklist</members>
 		<members>Sharing</members>
+		<members>PathAssistant</members>
 		<name>Settings</name>
 	</types>
 	<types>
