@@ -165,6 +165,12 @@
                 <elementReference>stage</elementReference>
             </value>
         </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <elementReference>summary</elementReference>
+            </value>
+        </inputAssignments>
         <object>Task</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordCreates>
