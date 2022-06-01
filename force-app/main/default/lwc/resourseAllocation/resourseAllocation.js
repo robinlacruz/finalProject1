@@ -4,6 +4,7 @@ import getProjectAndPLIs from '@salesforce/apex/ProjectResourcesHelper.getProjec
 export default class ResourseAllocation extends LightningElement {
     project;
     @api recordId;
+    resourcesById;
 
     @wire (getProjectAndPLIs,{projectId:'$recordId'})
     receivedProject(result){
@@ -12,10 +13,12 @@ export default class ResourseAllocation extends LightningElement {
         if(data){
             this.project = data;
             console.log('recibimos projects: ',data);
+
         } else if(error){
             console.log('Hubo error recibiendo projects', error);
         } else {
             console.log('project llego undefined');
         }
     }
+
 }
