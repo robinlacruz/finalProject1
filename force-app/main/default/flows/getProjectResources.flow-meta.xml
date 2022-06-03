@@ -5,7 +5,7 @@
         <name>PARAssigment</name>
         <label>PARAssigment</label>
         <locationX>264</locationX>
-        <locationY>638</locationY>
+        <locationY>518</locationY>
         <assignmentItems>
             <assignToReference>AllPAR</assignToReference>
             <operator>Add</operator>
@@ -21,7 +21,7 @@
         <name>TaskVariablesAssignment_0</name>
         <label>TaskVariablesAssignment</label>
         <locationX>176</locationX>
-        <locationY>974</locationY>
+        <locationY>854</locationY>
         <assignmentItems>
             <assignToReference>resource</assignToReference>
             <operator>Assign</operator>
@@ -113,7 +113,7 @@
         <name>IterateProjectLineItems</name>
         <label>IterateProjectLineItems</label>
         <locationX>176</locationX>
-        <locationY>398</locationY>
+        <locationY>278</locationY>
         <collectionReference>getProjectLineITems</collectionReference>
         <iterationOrder>Asc</iterationOrder>
         <nextValueConnector>
@@ -146,7 +146,7 @@
         <name>createTaskRecord</name>
         <label>createTaskRecord</label>
         <locationX>176</locationX>
-        <locationY>1334</locationY>
+        <locationY>1214</locationY>
         <inputAssignments>
             <field>Description</field>
             <value>
@@ -175,31 +175,10 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordCreates>
     <recordLookups>
-        <name>getProject</name>
-        <label>getProject</label>
-        <locationX>176</locationX>
-        <locationY>158</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>getProjectLineITems</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>currentProjectId</elementReference>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Project__c</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
         <name>getProjectAssignedResources</name>
         <label>getProjectAssignedResources</label>
         <locationX>264</locationX>
-        <locationY>518</locationY>
+        <locationY>398</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>PARAssigment</targetReference>
@@ -220,7 +199,7 @@
         <name>getProjectLineITems</name>
         <label>getProjectLineITems</label>
         <locationX>176</locationX>
-        <locationY>278</locationY>
+        <locationY>158</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>IterateProjectLineItems</targetReference>
@@ -230,7 +209,7 @@
             <field>Project__c</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>currentProjectId</elementReference>
+                <elementReference>projectRecord.Id</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>false</getFirstRecordOnly>
@@ -241,7 +220,7 @@
         <name>getSelectedUser</name>
         <label>getSelectedUser</label>
         <locationX>176</locationX>
-        <locationY>1214</locationY>
+        <locationY>1094</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>createTaskRecord</targetReference>
@@ -262,7 +241,7 @@
         <name>getTHEPAR</name>
         <label>getTHEPAR</label>
         <locationX>176</locationX>
-        <locationY>1094</locationY>
+        <locationY>974</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>getSelectedUser</targetReference>
@@ -283,7 +262,7 @@
         <name>Scren1</name>
         <label>Scren1</label>
         <locationX>176</locationX>
-        <locationY>854</locationY>
+        <locationY>734</locationY>
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
         <allowPause>true</allowPause>
@@ -351,7 +330,7 @@
         <locationX>50</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>getProject</targetReference>
+            <targetReference>getProjectLineITems</targetReference>
         </connector>
     </start>
     <status>Active</status>
@@ -421,6 +400,16 @@
         <isInput>false</isInput>
         <isOutput>false</isOutput>
         <objectType>Task</objectType>
+    </variables>
+    <variables>
+        <name>squadLead</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <value>
+            <elementReference>projectRecord.Squad_Lead__c</elementReference>
+        </value>
     </variables>
     <variables>
         <name>ssdsaqd</name>

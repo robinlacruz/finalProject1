@@ -44,16 +44,19 @@ export default class ProjectLineItem extends LightningElement {
     }
 
     getResources(role){
-        getResourcesByRole({role:role/*  ,startDate:this.startDateFilter,endDate:this.endDateFilter */}).then(data=>{
-            let resources = data;
-            let data1 = [];
-            resources.forEach(element => {
-                data1.push({resourceId:element.Id,resourceName:element.Name,resourceRate:element.Rate_p_hour__c,startDate:null,endDate:null,pliId:this.pliId,resourceRole:element.Role__c});
+        getResourcesByRole({role:role}).then(data=>{
+            this.resources = data.map(element => {
+                return {resourceId:element.Id,
+                        resourceName:element.Name,
+                        resourceRate:element.Rate_p_hour__c,
+                        startDate:null,
+                        endDate:null,
+                        pliId:this.pliId,
+                        resourceRole:element.Role__c}
             });
-            this.resources = data1;
-            getResourcesByIdMap({resources:resources}).then(data2=>{
-                console.log('resourcesByIdMap ->',data2);
-                this.resourcesById=data2;
+
+            getResourcesByIdMap({resources:resources}).then(data=>{
+                this.resourcesById=data;
             }).catch(error=>{
                 console.log('Hubo error en la funcion getResourcesByIdMap ',error);
             })
