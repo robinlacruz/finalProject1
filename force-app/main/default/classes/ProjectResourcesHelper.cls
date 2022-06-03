@@ -134,7 +134,7 @@ public with sharing class ProjectResourcesHelper {
             }  
             if( error!= null)
                 item.addError(error);
-          }
+        }
     }
 
     public static String validateAssignedDates(String resourceName, Date startDate,Date endDate,Project_Line_Item__c currentPLI,List<Project_Assigned_Resource__c> userAssignedResources){

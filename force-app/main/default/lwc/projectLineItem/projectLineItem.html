@@ -1,48 +1,54 @@
 <template>
     <div if:true={projectLineItem}>  
+
             <div if:true={projectLineItem.Role__c}>
-            <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} </h1>
-            <h2 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1em;">&nbsp;&nbsp;&nbsp;Estimated Hours: {projectLineItem.Estimated_Hours__c} - Assigned Hours: {projectLineItem.Assigned_Hours__c} </h2>
-            <h2 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1em;">&nbsp;&nbsp;&nbsp;Estimated Amount: {projectLineItem.Estimated_Amount__c}     - Assigned Amount: {projectLineItem.Assigned_Amount__c}</h2>
-            </div>
-            
-            <div >
-                <h2 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1em;">&nbsp;&nbsp;&nbsp;Filter Resources By Dates Availability</h2>
-                <lightning-layout>
-                    <lightning-layout-item padding="horizontal-small">
-                        <div class="header-column">
-                            <lightning-input type="date" name="startDateFilter" label="Start Date Filter" value={startDateFilter} onchange={handleChangeFilter} placeholder="Start Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
+                
+                    <h1 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1.2em;">{projectLineItem.Role__c} </h1>
+                    <h2 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1em;">&nbsp;&nbsp;&nbsp;Estimated Hours: {projectLineItem.Estimated_Hours__c} - Assigned Hours: {projectLineItem.Assigned_Hours__c} </h2>
+                    <h2 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1em;">&nbsp;&nbsp;&nbsp;Estimated Amount: {projectLineItem.Estimated_Amount__c}     - Assigned Amount: {projectLineItem.Assigned_Amount__c}</h2>
+                
+                
+                    <div >
+                        <h2 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1em;">&nbsp;&nbsp;&nbsp;Filter Resources By Dates Availability</h2>
+                        <lightning-layout>
+                            <lightning-layout-item padding="horizontal-small">
+                                <div class="header-column">
+                                    <lightning-input type="date" name="startDateFilter" label="Start Date Filter" value={startDateFilter} onchange={handleChangeFilter} placeholder="Start Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
+                                </div>
+                            </lightning-layout-item>      
+                            <lightning-layout-item padding="horizontal-small">
+                                <div class="header-column">
+                                    <lightning-input type="date" name="endDateFilter" label="End Date Filter" value={endDateFilter} onchange={handleChangeFilter} placeholder="End Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
+                                </div>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="horizontal-small">
+                                <br>
+                                <lightning-button variant="brand" label="Filter Resources" title="Primary action" onclick={handleFilter} class="slds-m-left_x-small"></lightning-button>
+                            </lightning-layout-item>
+                            <lightning-layout-item padding="horizontal-small">
+                                <br>
+                                <lightning-button variant="brand-outline" label="Clear Filter" title="Primary action" onclick={handleCancelFilter} class="slds-m-left_x-small"></lightning-button>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                        
+                    </div>
+                    <template if:true={resources}>
+                        <div class="slds-p-around_small">
+                            <lightning-datatable
+                                    key-field="resourceId"
+                                    data={resources}
+                                    show-row-number-column
+                                    row-number-offset={rowOffset}
+                                    columns={columns}
+                                    onsave={handleSave}
+                                    hide-checkbox-column=true
+                                    draft-values={draftValues}
+                                    >
+                            </lightning-datatable>
+                            <br>
                         </div>
-                    </lightning-layout-item>      
-                    <lightning-layout-item padding="horizontal-small">
-                        <div class="header-column">
-                            <lightning-input type="date" name="endDateFilter" label="End Date Filter" value={endDateFilter} onchange={handleChangeFilter} placeholder="End Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
-                        </div>
-                    </lightning-layout-item>
-                    <lightning-layout-item padding="horizontal-small">
-                        <br>
-                        <lightning-button variant="brand" label="Filter Resources" title="Primary action" onclick={handleFilter} class="slds-m-left_x-small"></lightning-button>
-                    </lightning-layout-item>
-                    <lightning-layout-item padding="horizontal-small">
-                        <br>
-                        <lightning-button variant="brand-outline" label="Clear Filter" title="Primary action" onclick={handleCancelFilter} class="slds-m-left_x-small"></lightning-button>
-                    </lightning-layout-item>
-                </lightning-layout>
+                    </template>
                 
             </div>
-            <template if:true={resources}>
-                <lightning-datatable
-                        key-field="resourceId"
-                        data={resources}
-                        show-row-number-column
-                        row-number-offset={rowOffset}
-                        columns={columns}
-                        onsave={handleSave}
-                        hide-checkbox-column=true
-                        draft-values={draftValues}
-                        >
-                </lightning-datatable>
-                <br>
-            </template>
     </div>
 </template>
