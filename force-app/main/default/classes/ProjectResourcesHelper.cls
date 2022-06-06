@@ -137,7 +137,6 @@ public with sharing class ProjectResourcesHelper {
                 item.addError(error);
         }
     }
-
     public static String validateAssignedDates(String resourceName, Date startDate,Date endDate,Project_Line_Item__c currentPLI,List<Project_Assigned_Resource__c> userAssignedResources){
         String error;
         if(startDate==null || endDate ==null){
@@ -356,11 +355,11 @@ public with sharing class ProjectResourcesHelper {
         
         //Id userId = UserInfo.getUserId();
         //martin brizuela->
-        Id userId = '0058a00000LgxtTAAR';
+        Id userId = '0058a00000LGNZRAA5';
         Set<Id> projectsID = new Set<Id>();
         
         try{
-            List<Project_Assigned_Resource__c> parList = [SELECT User__c,Project_Line_Item__r.Project__r.name,Project_Line_Item__r.Project__c,(SELECT Id,Project_Assigned_Resource__c,Subject__c,Status__c,Start_Date__c,Name,Priority__c,Description__c,Allocated_Hours__c,Registered_Hours__c FROM Resource_Tasks__r ORDER BY Status__c DESC) FROM Project_Assigned_Resource__c WHERE User__c = '0058a00000LgxtTAAR'];
+            List<Project_Assigned_Resource__c> parList = [SELECT User__c,Project_Line_Item__r.Project__r.name,Project_Line_Item__r.Project__c,(SELECT Id,Project_Assigned_Resource__c,Subject__c,Status__c,Start_Date__c,Name,Priority__c,Description__c,Allocated_Hours__c,Registered_Hours__c FROM Resource_Tasks__r ORDER BY Status__c DESC) FROM Project_Assigned_Resource__c WHERE User__c =:userId];
 
             Map<String,List<Resource_Task__c>> projectTasksMap = new Map<String,List<Resource_Task__c>>();        
                                               
