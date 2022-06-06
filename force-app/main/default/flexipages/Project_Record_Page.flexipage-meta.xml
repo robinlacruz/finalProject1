@@ -25,6 +25,19 @@
                 </componentInstanceProperties>
                 <componentName>force:highlightsPanel</componentName>
                 <identifier>force_highlightsPanel</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Stage__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Pre-Kickoff</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>projectTasks</componentName>
+                <identifier>c_projectTasks</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -48,8 +61,34 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>force:detailPanel</componentName>
-                <identifier>force_detailPanel1</identifier>
+                <componentName>taskAllocation</componentName>
+                <identifier>c_taskAllocation1</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 AND 2</booleanFilter>
+                    <criteria>
+                        <leftValue>{!Record.Stage__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>In progress</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.Squad_Lead__r.Username}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>$User.Username</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>resourseAllocation</componentName>
+                <identifier>c_resourseAllocation1</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.Stage__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Pre-Kickoff</rightValue>
+                    </criteria>
+                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <name>Facet-e1b1225e-6ced-4b8f-b760-ab02fc2205b0</name>
@@ -152,37 +191,8 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentInstanceProperties>
-                    <name>flowArguments</name>
-                    <value>[{&quot;label&quot;:&quot;currentProjectId&quot;,&quot;dataType&quot;:&quot;String&quot;,&quot;supportsRecordId&quot;:true,&quot;value&quot;:&quot;{!Record.Id}&quot;},{&quot;label&quot;:&quot;projectRecord&quot;,&quot;dataType&quot;:&quot;SObject&quot;,&quot;supportsRecordId&quot;:true,&quot;value&quot;:&quot;{!Record.Id}&quot;}]</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>flowLayout</name>
-                    <value>oneColumn</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>flowName</name>
-                    <value>getProjectResources</value>
-                </componentInstanceProperties>
-                <componentName>flowruntime:interview</componentName>
-                <identifier>flowruntime_interview1</identifier>
-                <visibilityRule>
-                    <criteria>
-                        <leftValue>{!Record.Stage__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>In progress</rightValue>
-                    </criteria>
-                </visibilityRule>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>tabs</name>
-                    <value>Facet-2499b2ad-fcbe-46cb-8a0a-fd59b73bc8c8</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tabset</componentName>
-                <identifier>flexipage_tabset1</identifier>
+                <componentName>force:detailPanel</componentName>
+                <identifier>force_detailPanel1</identifier>
             </componentInstance>
         </itemInstances>
         <mode>Replace</mode>
@@ -258,6 +268,10 @@
     <sobjectType>Project__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
+        <properties>
+            <name>enablePageActionConfig</name>
+            <value>true</value>
+        </properties>
     </template>
     <type>RecordPage</type>
 </FlexiPage>

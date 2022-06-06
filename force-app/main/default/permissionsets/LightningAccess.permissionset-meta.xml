@@ -357,11 +357,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Project__c.isCurrentUserSquadLead__c</field>
-        <readable>false</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
         <field>Resource_Task__c.Description__c</field>
         <readable>false</readable>
     </fieldPermissions>
