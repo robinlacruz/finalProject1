@@ -21,12 +21,12 @@
         <name>TaskVariablesAssignment_0</name>
         <label>TaskVariablesAssignment</label>
         <locationX>176</locationX>
-        <locationY>854</locationY>
+        <locationY>1094</locationY>
         <assignmentItems>
             <assignToReference>resource</assignToReference>
             <operator>Assign</operator>
             <value>
-                <elementReference>resourcePickList</elementReference>
+                <elementReference>picklist_resource</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
@@ -34,13 +34,6 @@
             <operator>Assign</operator>
             <value>
                 <elementReference>Resumen_tarea_a_realizar</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>description</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>Descripcion</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
@@ -71,8 +64,15 @@
                 <elementReference>Estado</elementReference>
             </value>
         </assignmentItems>
+        <assignmentItems>
+            <assignToReference>description</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>DescriptionTextArea</elementReference>
+            </value>
+        </assignmentItems>
         <connector>
-            <targetReference>getTHEPAR</targetReference>
+            <targetReference>getUserByThePAR</targetReference>
         </connector>
     </assignments>
     <choices>
@@ -108,7 +108,7 @@
         <valueField>Id</valueField>
     </dynamicChoiceSets>
     <interviewLabel>getProjectResource {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>getProjectResources</label>
+    <label>Asignación de tareas</label>
     <loops>
         <name>IterateProjectLineItems</name>
         <label>IterateProjectLineItems</label>
@@ -120,7 +120,7 @@
             <targetReference>getProjectAssignedResources</targetReference>
         </nextValueConnector>
         <noMoreValuesConnector>
-            <targetReference>Scren1</targetReference>
+            <targetReference>get_resource_screen</targetReference>
         </noMoreValuesConnector>
     </loops>
     <processMetadataValues>
@@ -143,32 +143,38 @@
     </processMetadataValues>
     <processType>Flow</processType>
     <recordCreates>
-        <name>createTaskRecord</name>
-        <label>createTaskRecord</label>
+        <name>createTask</name>
+        <label>createTask</label>
         <locationX>176</locationX>
-        <locationY>1214</locationY>
+        <locationY>1334</locationY>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>Fecha_Fin</elementReference>
+            </value>
+        </inputAssignments>
         <inputAssignments>
             <field>Description</field>
             <value>
-                <elementReference>description</elementReference>
+                <elementReference>DescriptionTextArea</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
             <field>OwnerId</field>
             <value>
-                <elementReference>getSelectedUser.Id</elementReference>
+                <elementReference>getUserByThePAR.Id</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
             <field>Status</field>
             <value>
-                <elementReference>stage</elementReference>
+                <elementReference>Estado</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
             <field>Subject</field>
             <value>
-                <elementReference>summary</elementReference>
+                <elementReference>Resumen_tarea_a_realizar</elementReference>
             </value>
         </inputAssignments>
         <object>Task</object>
@@ -217,114 +223,309 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
-        <name>getSelectedUser</name>
-        <label>getSelectedUser</label>
+        <name>getThePAR</name>
+        <label>getThePAR</label>
         <locationX>176</locationX>
-        <locationY>1094</locationY>
+        <locationY>854</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>createTaskRecord</targetReference>
+            <targetReference>Scren1</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
             <field>Id</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>getTHEPAR.User__r.Id</elementReference>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>User</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
-        <name>getTHEPAR</name>
-        <label>getTHEPAR</label>
-        <locationX>176</locationX>
-        <locationY>974</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>getSelectedUser</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>resource</elementReference>
+                <elementReference>picklist_resource</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
         <object>Project_Assigned_Resource__c</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
+    <recordLookups>
+        <name>getUserByThePAR</name>
+        <label>getUserByThePAR</label>
+        <locationX>176</locationX>
+        <locationY>1214</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>createTask</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>getThePAR.User__r.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>User</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <screens>
+        <name>get_resource_screen</name>
+        <label>get Resource</label>
+        <locationX>176</locationX>
+        <locationY>734</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>getThePAR</targetReference>
+        </connector>
+        <fields>
+            <name>get_resource_screen_Section1</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>get_resource_screen_Section1_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>picklist_resource</name>
+                    <choiceReferences>choiceSetPAR</choiceReferences>
+                    <dataType>String</dataType>
+                    <fieldText>Seleccionar recurso :</fieldText>
+                    <fieldType>DropdownBox</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>get_resource_screen_Section1_Column2</name>
+                <fieldType>Region</fieldType>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>get_resource_screen_Section1_Column3</name>
+                <fieldType>Region</fieldType>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <isRequired>false</isRequired>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
     <screens>
         <name>Scren1</name>
         <label>Scren1</label>
         <locationX>176</locationX>
-        <locationY>734</locationY>
+        <locationY>974</locationY>
         <allowBack>true</allowBack>
         <allowFinish>true</allowFinish>
-        <allowPause>true</allowPause>
+        <allowPause>false</allowPause>
         <connector>
             <targetReference>TaskVariablesAssignment_0</targetReference>
         </connector>
         <fields>
-            <name>resourcePickList</name>
-            <choiceReferences>choiceSetPAR</choiceReferences>
-            <dataType>String</dataType>
-            <fieldText>Recurso a asignar :</fieldText>
-            <fieldType>DropdownBox</fieldType>
+            <name>Scren1_Section1</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>Scren1_Section1_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>projectName</name>
+                    <fieldText>&lt;p&gt;&lt;span style=&quot;font-size: 24px;&quot;&gt;{!projectRecord.Name}&lt;/span&gt;&lt;/p&gt;</fieldText>
+                    <fieldType>DisplayText</fieldType>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Scren1_Section1_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>ProjectStartDate</name>
+                    <fieldText>&lt;p&gt;&lt;b style=&quot;font-size: 16px;&quot;&gt;Fecha inicio&lt;/b&gt;&lt;span style=&quot;font-size: 16px;&quot;&gt;:{!projectRecord.Start_Date__c}&lt;/span&gt;&lt;/p&gt;</fieldText>
+                    <fieldType>DisplayText</fieldType>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Scren1_Section1_Column3</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>ProjectEndDate</name>
+                    <fieldText>&lt;p&gt;&lt;b style=&quot;background-color: rgb(255, 255, 255); color: rgb(68, 68, 68); font-size: 16px;&quot;&gt;Fecha fin&lt;/b&gt;&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgb(68, 68, 68); font-size: 16px;&quot;&gt;: {!projectRecord.End_Date__c}&lt;/span&gt;&lt;/p&gt;</fieldText>
+                    <fieldType>DisplayText</fieldType>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
             <isRequired>false</isRequired>
         </fields>
         <fields>
-            <name>Resumen_tarea_a_realizar</name>
-            <dataType>String</dataType>
-            <fieldText>Resumen tarea a realizar :</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>true</isRequired>
+            <name>Scren1_Section2</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>Scren1_Section2_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Fecha_Inicio</name>
+                    <dataType>Date</dataType>
+                    <defaultValue>
+                        <elementReference>getThePAR.Start_Date__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Fecha Inicio :</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                    <validationRule>
+                        <errorMessage>&lt;p&gt;&lt;span style=&quot;color: rgb(255, 0, 0);&quot;&gt;La fecha debe estar comprendida entre {!getThePAR.Start_Date__c} y {!getThePAR.End_Date__c}&lt;/span&gt;&lt;/p&gt;</errorMessage>
+                        <formulaExpression>AND({!Fecha_Inicio} &gt;={!getThePAR.Start_Date__c} , {!Fecha_Inicio}&lt;{!getThePAR.End_Date__c})</formulaExpression>
+                    </validationRule>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Scren1_Section2_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Fecha_Fin</name>
+                    <dataType>Date</dataType>
+                    <defaultValue>
+                        <elementReference>getThePAR.End_Date__c</elementReference>
+                    </defaultValue>
+                    <fieldText>Fecha Fin :</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                    <validationRule>
+                        <errorMessage>&lt;p&gt;&lt;span style=&quot;color: rgb(255, 0, 0); background-color: rgb(255, 255, 255);&quot;&gt;La fecha debe estar comprendida entre {!getThePAR.Start_Date__c} y {!getThePAR.End_Date__c}&lt;/span&gt;&lt;/p&gt;</errorMessage>
+                        <formulaExpression>AND({!Fecha_Fin} &lt;={!getThePAR.End_Date__c} , {!Fecha_Fin}&gt;{!getThePAR.Start_Date__c})</formulaExpression>
+                    </validationRule>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Scren1_Section2_Column3</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Horas_estimadas</name>
+                    <dataType>Number</dataType>
+                    <fieldText>Horas estimadas:</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                    <scale>0</scale>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <isRequired>false</isRequired>
         </fields>
         <fields>
-            <name>Descripcion</name>
-            <dataType>String</dataType>
-            <fieldText>Descripcion :</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>true</isRequired>
+            <name>Scren1_Section3</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>Scren1_Section3_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Resumen_tarea_a_realizar</name>
+                    <dataType>String</dataType>
+                    <fieldText>Resumen tarea a realizar :</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Scren1_Section3_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Estado</name>
+                    <choiceReferences>No_iniciada</choiceReferences>
+                    <choiceReferences>En_Progreso</choiceReferences>
+                    <choiceReferences>Completada</choiceReferences>
+                    <dataType>String</dataType>
+                    <fieldText>Estado :</fieldText>
+                    <fieldType>DropdownBox</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>Scren1_Section3_Column3</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>DescriptionTextArea</name>
+                    <fieldText>Descripcion :</fieldText>
+                    <fieldType>LargeTextArea</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>4</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <isRequired>false</isRequired>
         </fields>
-        <fields>
-            <name>Fecha_Inicio</name>
-            <dataType>Date</dataType>
-            <fieldText>Fecha Inicio :</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>true</isRequired>
-        </fields>
-        <fields>
-            <name>Fecha_Fin</name>
-            <dataType>Date</dataType>
-            <fieldText>Fecha Fin :</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>true</isRequired>
-        </fields>
-        <fields>
-            <name>Horas_estimadas</name>
-            <dataType>Number</dataType>
-            <fieldText>Horas estimadas:</fieldText>
-            <fieldType>InputField</fieldType>
-            <isRequired>true</isRequired>
-            <scale>0</scale>
-        </fields>
-        <fields>
-            <name>Estado</name>
-            <choiceReferences>No_iniciada</choiceReferences>
-            <choiceReferences>En_Progreso</choiceReferences>
-            <choiceReferences>Completada</choiceReferences>
-            <dataType>String</dataType>
-            <fieldText>Estado :</fieldText>
-            <fieldType>DropdownBox</fieldType>
-            <isRequired>true</isRequired>
-        </fields>
+        <nextOrFinishButtonLabel>Asignar Tarea</nextOrFinishButtonLabel>
         <showFooter>true</showFooter>
-        <showHeader>true</showHeader>
+        <showHeader>false</showHeader>
     </screens>
     <start>
         <locationX>50</locationX>
@@ -370,6 +571,14 @@
         <isInput>false</isInput>
         <isOutput>false</isOutput>
         <scale>0</scale>
+    </variables>
+    <variables>
+        <name>picklistResourceValue</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Project_Assigned_Resource__c</objectType>
     </variables>
     <variables>
         <name>projectOfTask</name>

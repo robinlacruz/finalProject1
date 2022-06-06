@@ -25,18 +25,25 @@
 				<lightning-card>
 					<div class="slds-m-around_xx-small">
 						<lightning-layout multiple-rows>
-							<lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="4"
+							<lightning-layout-item size="12" small-device-size="12" medium-device-size="4" large-device-size="4"
 								padding="horizontal-small">
 								<div class="custom-box">
 									<lightning-input name='summary' type="text" label="Summary" placeholder="Task summary"
-										minlength="6" onchange={handleFieldsChange}></lightning-input>
+										minlength="6" onchange={handleFieldsChange} required ></lightning-input>
 								</div>
 							</lightning-layout-item>
-							<lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="8"
+							<lightning-layout-item size="12" small-device-size="12" medium-device-size="4" large-device-size="4"
 								padding="horizontal-small">
 								<div class="custom-box">
 									<lightning-textarea name="description" label="" placeholder="task description"
-										onchange={handleFieldsChange}></lightning-textarea>
+										onchange={handleFieldsChange} required></lightning-textarea>
+								</div>
+							</lightning-layout-item>
+							<lightning-layout-item size="12" small-device-size="12" medium-device-size="4" large-device-size="4"
+								padding="horizontal-small">
+								<div class="custom-box">
+									<lightning-combobox name="priority" value={priority} placeholder="Priority"
+									options={optionsPriority} onchange={handleFieldsChange} required></lightning-combobox>
 								</div>
 							</lightning-layout-item>
 						</lightning-layout>
@@ -45,20 +52,20 @@
 							<lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="4"
 								padding="horizontal-small">
 								<div class="custom-box">
-									<lightning-input type="date" name="startDate" label="Start date" value="2022-09-07" onchange={handleFieldsChange}></lightning-input>
+									<lightning-input type="date" name="startDate" label="Start date" value={startDate} onchange={handleFieldsChange} required></lightning-input>
 								</div>
 							</lightning-layout-item>
 							<lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="4"
 								padding="horizontal-small">
 								<div class="custom-box">
-									<lightning-input type="date" name="endDate" label="End date" value="2022-09-07"
-										 onchange={handleFieldsChange}></lightning-input>
+									<lightning-input type="date" name="endDate" label="End date" value={endDate} 
+										 onchange={handleFieldsChange} required></lightning-input>
 								</div>
 							</lightning-layout-item>
 							<lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="4"
 								padding="horizontal-small">
 								<div class="custom-box">
-									<lightning-input type="number" name="nOfHours" label="Number of estimated hours"
+									<lightning-input type="number" name="nOfHours" label="Number of estimated hours" value={fields.nOfHours}
 										onchange={handleFieldsChange}></lightning-input>
 								</div>
 							</lightning-layout-item>

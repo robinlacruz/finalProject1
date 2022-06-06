@@ -126,11 +126,48 @@ public with sharing class ProjectResourcesHelper {
     @AuraEnabled
     public static void insertTask(Resource_Task__c task){
         try{
+            Resource_Task__c taskdb = [SELECT id from Resource_Task__c LIMIT 1 ];
             insert task;
-        } catch(DmlException e){
+        } catch(Exception e){
+            system.debug('en insertTask exception');
             throw new My1Exception(e.getMessage());  
         }
     }
+
+
+    @AuraEnabled(cacheable=true)
+    public static Map<String,List<Resource_Task__c>> getUserTasks(){
+        
+        //Id userId = UserInfo.getUserId();
+        //martin brizuela->
+        Id userId = '0058a00000LGNZRAA5';
+        Set<Id> projectsID = new Set<Id>();
+        
+        try{
+        List<Project_Assigned_Resource__c> parList = [SELECT User__c,Project_Line_Item__r.Project__r.name,(SELECT id,Project_Assigned_Resource__c,Subject__c,Status__c,Start_Date__c,Name,Priority__c,Description__c,Allocated_Hours__c,Registered_Hours__c FROM Resource_Tasks__r ORDER BY Status__c DESC) 
+                                                        FROM Project_Assigned_Resource__c WHERE User__c = :userId];
+
+        Map<String,List<Resource_Task__c>> projectTasksMap = new Map<String,List<Resource_Task__c>>();                                    
+        for(Project_Assigned_Resource__c par  : parList){
+            if(!projectsID.contains(par.Project_Line_Item__r.Project__c)){
+                system.debug(par.Project_Line_Item__r.Project__c);
+                projectsID.add(par.Project_Line_Item__r.Project__c);
+                projectTasksMap.put(par.Project_Line_Item__r.Project__r.name,par.Resource_Tasks__r);
+            }
+           
+        }
+        system.debug(projectTasksMap);
+        return projectTasksMap;                       
+        }
+
+        catch(Exception e){
+            throw new My1Exception(e.getMessage());
+        }
+
+        
+    }
+
+
     @AuraEnabled
     public static Project_Assigned_Resource__c getPARByUserAndDates(Id userId, Date startDate, Date endDate){
         List<Project_Assigned_Resource__c> PARs = [SELECT Start_Date__c, End_Date__c, User__r.Name FROM Project_Assigned_Resource__c WHERE User__c =: userId AND (Start_Date__c <= :startDate AND End_Date__c >= :endDate)];
@@ -142,11 +179,14 @@ public with sharing class ProjectResourcesHelper {
     }
 
     public static void validateTasks(List<Resource_Task__c> tasks){
+       system.debug('en validateTask');
+       system.debug(tasks);
         String error=null;
         Set<Id> PARsIds = new Set<Id>();
         for (Resource_Task__c tsk : tasks) {
             PARsIds.add(tsk.Project_Assigned_Resource__c);
         }
+
         Map<Id, Project_Assigned_Resource__c> PARsMap = new Map<Id, Project_Assigned_Resource__c>([SELECT Id, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Id IN :PARsIds]);
         for (Resource_Task__c tsk1 : tasks) {
             if(tsk1.Start_Date__c>tsk1.End_Date__c){
