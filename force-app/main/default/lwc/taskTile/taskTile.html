@@ -18,7 +18,8 @@
             <div class="slds-col slds-small-size_12-of-12 slds-medium-size_7-of-12 slds-large-size_7-of-12">
                 <span class="custom-box">
                     <div if:true ={taskIsStarted}>
-                        <lightning-input type="number" name="loadHours" label="Load hours" placeholder="enter hours" value={hours} onchange={handleInput}></lightning-input> <lightning-button label="Load hours" title="Load hours" onclick={handleLoadHours} class="slds-m-left_x-small"></lightning-button>
+                        <lightning-input type="number" name="loadHours" label="Load hours" placeholder="enter hours" value={hours} onchange={handleInput}></lightning-input> 
+                        <lightning-button label="Load hours" title="Load hours" onclick={handleLoadHours} class="slds-m-left_x-small"></lightning-button>
                         <lightning-button label="Mark as completed" title="Mark as completed" onclick={handleMarkCompleted} class="slds-m-left_x-small"></lightning-button>
                     </div>
                     <div if:false={taskIsStarted}>

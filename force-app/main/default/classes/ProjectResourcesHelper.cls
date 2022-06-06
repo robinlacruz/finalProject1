@@ -387,4 +387,9 @@ public with sharing class ProjectResourcesHelper {
 
         
     }
+
+    @AuraEnabled
+    public static void updateTask(Resource_Task__c task){
+        update task;
+    }
 }

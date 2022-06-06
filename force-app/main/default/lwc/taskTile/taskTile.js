@@ -1,46 +1,58 @@
-import { LightningElement,api,track} from 'lwc';
+import { LightningElement, api, track } from "lwc";
+import updateTask from "@salesforce/apex/ProjectResourcesHelper.updateTask";
 
 export default class TaskTile extends LightningElement {
+  @api task;
 
-    @api task;
-    taskIsStarted = false;
-    taskIsCompleted = false;
-    @track hours; 
+  taskIsStarted = false;
+  taskIsCompleted = false;
+  hours = 0;
 
-    connectedCallback(){
-        this.task= JSON.parse(JSON.stringify(this.task));
-        this.hours = this.task.Registered_Hours__c;
-        if(this.task.Status__c != 'Not Started' ){
-            this.taskIsStarted = true;    
-           }
-           else{
-               this.taskIsStarted = false;
-           }
-          
+  connectedCallback() {
+    this.task = JSON.parse(JSON.stringify(this.task));
+    if (this.task.Status__c != "Not Started") {
+      this.taskIsStarted = true;
+    } else {
+      this.taskIsStarted = false;
+      if (this.task.Status__c == "Completed") {
+        this.taskIsCompleted = true;
+      }
     }
+  }
 
-    handleMarkCompleted(){
-        if(this.task.Allocated_Hours__c <= this.task.Registered_Hours__c){
-            this.task.Status__c = 'Completed';
-            this.taskIsCompleted = true;
-        }
-        console.log(this.task);    
-
+  handleMarkCompleted() {
+    if (this.task.Allocated_Hours__c <= this.task.Registered_Hours__c) {
+      this.task.Status__c = "Completed";
+      this.taskIsCompleted = true;
+      updateTask({ task: this.task })
+        .then(() => {
+          console.log("Task succesfully updated");
+        })
+        .catch((error) => {
+          console.log("Error updating task ", error);
+        });
     }
+  }
 
-    handleLoadHours(){
-        this.hours = parseInt(this.hours) + parseInt(this.task.Registered_Hours__c);
-        this.task.Registered_Hours__c =this.hours;
-        this.hours = 0;
-    }
+  handleLoadHours() {
+    this.task.Registered_Hours__c =
+      parseInt(this.hours) + parseInt(this.task.Registered_Hours__c);
+    this.hours = 0;
+    updateTask({ task: this.task })
+      .then(() => {
+        console.log("Task succesfully updated");
+      })
+      .catch((error) => {
+        console.log("Error updating task ", error);
+      });
+  }
 
-    handleInput(evt){
-        this.hours = evt.target.value;
-    }
+  handleInput(evt) {
+    this.hours = evt.target.value;
+  }
 
-    handleStartTask(){
-        this.task.Status__c = 'In Progress';
-        this.taskIsStarted = true;
-    }
-
+  handleStartTask() {
+    this.task.Status__c = "In Progress";
+    this.taskIsStarted = true;
+  }
 }
