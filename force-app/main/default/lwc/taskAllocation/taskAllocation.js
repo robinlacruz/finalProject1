@@ -142,6 +142,20 @@ export default class TaskAllocation extends LightningElement {
     });
     this.dispatchEvent(evt);
   }
+
+  handleCancelTask() {
+    console.log("dentro de handleCancelTask");
+    this.fields = {
+      summary: "",
+      description: "",
+      startDate: null,
+      endDate: null,
+      nOfHours: 0,
+      projectId: null,
+      resourceId: this.selectedResource,
+      role: this.selectedRole
+    };
+  }
 }
 
 /*import RESOURCETASK_OBJECT from '@salesforce/schema/Resource_Task__c';

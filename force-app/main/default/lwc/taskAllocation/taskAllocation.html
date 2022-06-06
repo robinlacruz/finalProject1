@@ -85,8 +85,13 @@
 			</lightning-layout-item>
 		</lightning-layout>
 		<br>
-		<lightning-button variant="brand" label="Create task" title="Primary action" onclick={handleCreateTask}
-			class="slds-m-left_x-small slds-align_absolute-center">
-		</lightning-button>
+		<div>
+			<lightning-button variant="brand" label="Create task" title="Primary action" onclick={handleCreateTask}
+				class="slds-m-left_x-small slds-align_absolute-center">
+			</lightning-button>
+			<!-- <lightning-button variant="destructive-text" label="Cancel" title="Primary action" onclick={handleCancelTask}
+				class="slds-m-left_x-small slds-align_absolute-center">
+			</lightning-button> -->
+		</div>
 	</lightning-card>
 </template>

@@ -1,4 +1,4 @@
-import { LightningElement, api, track } from "lwc";
+import { LightningElement, api } from "lwc";
 import updateTask from "@salesforce/apex/ProjectResourcesHelper.updateTask";
 
 export default class TaskTile extends LightningElement {
@@ -12,11 +12,11 @@ export default class TaskTile extends LightningElement {
     this.task = JSON.parse(JSON.stringify(this.task));
     if (this.task.Status__c != "Not Started") {
       this.taskIsStarted = true;
-    } else {
-      this.taskIsStarted = false;
       if (this.task.Status__c == "Completed") {
         this.taskIsCompleted = true;
       }
+    } else {
+      this.taskIsStarted = false;
     }
   }
 
