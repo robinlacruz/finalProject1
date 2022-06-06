@@ -48,17 +48,108 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>resourseAllocation</componentName>
-                <identifier>c_resourseAllocation1</identifier>
-                <visibilityRule>
-                    <criteria>
-                        <leftValue>{!Record.Stage__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>Pre-Kickoff</rightValue>
-                    </criteria>
-                </visibilityRule>
+                <componentName>force:detailPanel</componentName>
+                <identifier>force_detailPanel1</identifier>
             </componentInstance>
         </itemInstances>
+        <name>Facet-e1b1225e-6ced-4b8f-b760-ab02fc2205b0</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>resourseAllocation</componentName>
+                <identifier>c_resourseAllocation1</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-f201e48c-de60-4837-9a1f-b2ab060d1f09</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>taskAllocation</componentName>
+                <identifier>c_taskAllocation</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-78b4a426-d43a-409d-8f28-59a43f381524</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>userTasks</componentName>
+                <identifier>c_userTasks</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-c6brxyu63ok</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-e1b1225e-6ced-4b8f-b760-ab02fc2205b0</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Standard.Tab.detail</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>active</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-f201e48c-de60-4837-9a1f-b2ab060d1f09</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Resources Allocation</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab1</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-78b4a426-d43a-409d-8f28-59a43f381524</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Task Allocation</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-c6brxyu63ok</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>userTasks</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab3</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-2499b2ad-fcbe-46cb-8a0a-fd59b73bc8c8</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
@@ -86,8 +177,12 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
-                <componentName>force:detailPanel</componentName>
-                <identifier>force_detailPanel1</identifier>
+                <componentInstanceProperties>
+                    <name>tabs</name>
+                    <value>Facet-2499b2ad-fcbe-46cb-8a0a-fd59b73bc8c8</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tabset</componentName>
+                <identifier>flexipage_tabset1</identifier>
             </componentInstance>
         </itemInstances>
         <mode>Replace</mode>
@@ -119,6 +214,13 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:reportChart</componentName>
                 <identifier>flexipage_reportChart1</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.isCurrentUserSquadLead__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <itemInstances>

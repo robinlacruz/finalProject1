@@ -391,10 +391,10 @@
         <readable>false</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>Lightning Access</label>
+    <label>seeCustomObjects</label>
     <license>Identity</license>
-    <userPermissions>
-        <enabled>true</enabled>
-        <name>LightningExperienceUser</name>
-    </userPermissions>
+    <tabSettings>
+        <tab>standard-UserProfile</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 </PermissionSet>

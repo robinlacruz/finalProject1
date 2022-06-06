@@ -99,6 +99,11 @@
             <field>Estimated_Profit__c</field>
             <table>Project__c</table>
         </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>isCurrentUserSquadLead__c</field>
+            <table>Project__c</table>
+        </columns>
         <masterLabel>Projects</masterLabel>
     </sections>
     <sections>

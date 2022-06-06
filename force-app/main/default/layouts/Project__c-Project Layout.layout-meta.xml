@@ -31,6 +31,10 @@
                 <behavior>Required</behavior>
                 <field>Stage__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>isCurrentUserSquadLead__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
