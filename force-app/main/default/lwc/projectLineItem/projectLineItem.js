@@ -4,6 +4,7 @@ import getResourcesByIdMap from "@salesforce/apex/ProjectResourcesHelper.getReso
 import getProjectLineItem from "@salesforce/apex/ProjectResourcesHelper.getProjectLineItem";
 import getResourcesByRole from "@salesforce/apex/ProjectResourcesHelper.getResourcesByRole";
 import getResourcesByRoleAndDate from "@salesforce/apex/ProjectResourcesHelper.getResourcesByRoleAndDate";
+import getResourcesAvailability from "@salesforce/apex/ProjectResourcesHelper.getResourcesAvailability";
 import { refreshApex } from "@salesforce/apex";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 

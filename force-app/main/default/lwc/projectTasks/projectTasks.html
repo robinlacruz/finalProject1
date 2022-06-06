@@ -1,0 +1,33 @@
+<template>
+<div class = "slds-m-left_xx-large">
+    <lightning-card >
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_2-of-12 slds-large-size_2-of-12">
+                <span class="custom-box">TASK</span>
+            </div>
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
+                <span class="custom-box">Status</span>
+            </div>
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
+                <span class="custom-box">Estimated Hours</span>
+            </div>
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
+                <span class="custom-box">Records of hours</span>
+            </div>
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_7-of-12 slds-large-size_7-of-12">
+                <span class="custom-box">Actions</span>
+            </div>
+        </div>
+    </lightning-card>    
+<div if:true={currentProjectTasks}>
+    <template for:each={currentProjectTasks} for:item="currentProjectTasksItem">
+        <div key={currentProjectTasksItem.id}>
+            <c-task-tile task={currentProjectTasksItem}></c-task-tile>
+        </div>
+    </template>
+</div>
+
+</div>
+        
+   
+</template>

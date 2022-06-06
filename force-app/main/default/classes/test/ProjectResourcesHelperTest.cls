@@ -261,6 +261,7 @@ public with sharing class ProjectResourcesHelperTest{
         update projects;
         projects = [SELECT Id, Start_Date__c, Estimated_Amount__c, Assigned_Amount__c FROM Project__c];
         system.assertEquals(true, ProjectResourcesHelper.isProfitable(projects[0]));
+        
         projects[0].Estimated_Amount__c = totalAssignedHours*(resourcesRate-1);
         update projects;
         projects = [SELECT Id, Start_Date__c, Estimated_Amount__c, Assigned_Amount__c FROM Project__c];
