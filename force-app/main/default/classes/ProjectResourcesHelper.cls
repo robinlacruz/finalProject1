@@ -259,7 +259,7 @@ public with sharing class ProjectResourcesHelper {
         system.debug(error);
     }
       
-    /* @AuraEnabled
+    @AuraEnabled
     public static Map<Id,List<Resource_Task__c>> getResourceTasksByProjectMap(Id userId){
         List<Resource_Task__c> tasks= [SELECT Id,Allocated_Hours__c,Subject__c,Status__c,Start_Date__c,End_Date__c,Description__c,Priority__c,Registered_Hours__c, Project_Assigned_Resource__c FROM Resource_Task__c WHERE Project_Assigned_Resource__r.User__c =:userId];
         Map<Id,List<Resource_Task__c>> tasksByPARIdMap = new Map<Id,List<Resource_Task__c>>();
@@ -285,9 +285,9 @@ public with sharing class ProjectResourcesHelper {
         }
 
         return tasksByProjectIdMap;
-    } */
+    }
 
-    /* @AuraEnabled
+    @AuraEnabled
     public static Map<Id,Project__c> getProjectsByIdMap(Id userId){
         List<Project_Assigned_Resource__c> PARs = [SELECT Id, Project_Line_Item__r.Project__c FROM Project_Assigned_Resource__c WHERE User__c =:userId];
         Set<Id> projectIdsSet = new Set<Id>();
@@ -297,7 +297,7 @@ public with sharing class ProjectResourcesHelper {
         List<Id> projectIds = new List<Id>(projectIdsSet);
         Map<Id,Project__c> projectsByIdMap = new Map<Id,Project__c>([SELECT Name, Stage__c, Squad_Lead__c, 	isCurrentUserSquadLead__c FROM Project__c WHERE Id IN :projectIds]);
         return projectsByIdMap;   
-    } */
+    }
 
 
     public class DatesWrapper{

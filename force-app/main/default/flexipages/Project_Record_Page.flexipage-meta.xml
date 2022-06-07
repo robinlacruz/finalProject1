@@ -78,16 +78,6 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>userTasks</componentName>
-                <identifier>c_userTasks</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-c6brxyu63ok</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
                 <componentInstanceProperties>
                     <name>body</name>
                     <value>Facet-e1b1225e-6ced-4b8f-b760-ab02fc2205b0</value>
@@ -130,20 +120,6 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>flexipage_tab</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-c6brxyu63ok</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>title</name>
-                    <value>userTasks</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tab</componentName>
-                <identifier>flexipage_tab3</identifier>
             </componentInstance>
         </itemInstances>
         <name>Facet-2499b2ad-fcbe-46cb-8a0a-fd59b73bc8c8</name>
@@ -214,13 +190,6 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:reportChart</componentName>
                 <identifier>flexipage_reportChart1</identifier>
-                <visibilityRule>
-                    <criteria>
-                        <leftValue>{!Record.isCurrentUserSquadLead__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>true</rightValue>
-                    </criteria>
-                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <itemInstances>

@@ -1,34 +1,34 @@
-<template>
-    <!-- Row 1 -->
+<template> 
     <template if:false={taskIsCompleted}>
-    <lightning-card>
-        <div class="slds-grid slds-wrap">
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_2-of-12 slds-large-size_2-of-12">
-                <span class="custom-box">{task.Subject__c}</span>
-            </div>
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
-                <span class="custom-box">{task.Status__c}</span>
-            </div>
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
-                <span class="custom-box">{task.Allocated_Hours__c}</span>
-            </div>
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
-                <span class="custom-box">{task.Registered_Hours__c}</span>
-            </div>
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_7-of-12 slds-large-size_7-of-12">
-                <span class="custom-box">
-                    <div if:true ={taskIsStarted}>
-                        <lightning-input type="number" name="loadHours" label="Load hours" placeholder="enter hours" value={hours} onchange={handleInput}></lightning-input> 
-                        <lightning-button label="Load hours" title="Load hours" onclick={handleLoadHours} class="slds-m-left_x-small"></lightning-button>
-                        <lightning-button label="Mark as completed" title="Mark as completed" onclick={handleMarkCompleted} class="slds-m-left_x-small"></lightning-button>
+        <lightning-card>
+            <div class="slds-grid slds-wrap slds-box slds-box slds-box_xx-small" >
+                <div class="slds-col slds-small-size_12-of-12 slds-medium-size_2-of-12 slds-large-size_2-of-12 slds-align_absolute-center" >
+                    <span class="custom-box">{task.Subject__c}</span>
+                </div>
+                <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12 slds-align_absolute-center">
+                    <span class="custom-box">{task.Status__c}</span>
+                </div>
+                <div class="slds-col slds-small-size_12-of-12 slds-medium-size_2-of-12 slds-large-size_2-of-12 slds-align_absolute-center" >
+                    <span class="custom-box">{task.Allocated_Hours__c}</span>
+                </div>
+                <div class="slds-col slds-small-size_12-of-12 slds-medium-size_2-of-12 slds-large-size_2-of-12 slds-align_absolute-center">
+                    <span class="custom-box">{task.Registered_Hours__c}</span>
+                </div>
+                <div class="slds-col slds-small-size_12-of-12 slds-medium-size_5-of-12 slds-large-size_5-of-12 slds-align_absolute-center">
+                    <div class="custom-box slds-wrap">
+                       <div if:true ={taskIsStarted} class="slds-align_absolute-center">
+                            <input type="number" name="loadHours" placeholder="enter hours" value={hours} onchange={handleInput}></input> 
+                            <lightning-button label="Load hours" title="Load hours" onclick={handleLoadHours} class="slds-m-left_x-small"></lightning-button>
+                            <lightning-button label="Mark as completed" title="Mark as completed" onclick={handleMarkCompleted} class="slds-m-left_x-small"></lightning-button>
+                        </div>
+                        <div if:false={taskIsStarted}>
+                            <lightning-button label="Start Task" title="Non-primary action" onclick={handleStartTask} class="slds-m-left_x-small">
+                            </lightning-button>
+                        </div>
                     </div>
-                    <div if:false={taskIsStarted}>
-                        <lightning-button label="Start Task" title="Non-primary action" onclick={handleStartTask} class="slds-m-left_x-small"></lightning-button>
-                    </div>
-                    
-                </span>
+                </div>
+                
             </div>
-        </div>
-    </lightning-card>
-</template>
-</template>
+        </lightning-card>
+    </template> 
+    </template>
