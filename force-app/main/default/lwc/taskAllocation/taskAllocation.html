@@ -91,15 +91,32 @@
 				</lightning-button>
 				<lightning-button variant="destructive-text" label="Cancel" title="Cancel" onclick={handleCancelTask} class="slds-m-left_x-small">
 				</lightning-button>
-				</Template>
-				<Template if:true={fields.resourceId}>
+				<span if:false={showAvailability}><lightning-button variant="brand" label="Check Available Dates" title="Check Available Dates" onclick={handleCheckAvailableDates} class="slds-m-left_x-small">
+				</lightning-button></span>
+				<span if:true={showAvailability}><lightning-button variant="brand" label="Hide Available Dates" title="Check Available Dates" onclick={handleCheckAvailableDates} class="slds-m-left_x-small">
+				</lightning-button></span>
+			</Template>
+			<Template if:true={fields.resourceId}>
 					<lightning-button variant="brand" label="Create task" title="Create Task" onclick={handleCreateTask} class="slds-m-left_x-small">
 					</lightning-button>
 					<lightning-button variant="destructive-text" label="Cancel" title="Cancel" onclick={handleCancelTask} class="slds-m-left_x-small">
 					</lightning-button>
-				</Template>
-			
+					<span if:false={showAvailability}><lightning-button variant="brand" label="Check Available Dates" title="Check Available Dates" onclick={handleCheckAvailableDates} class="slds-m-left_x-small">
+					</lightning-button></span>
+					<span if:true={showAvailability}><lightning-button variant="brand" label="Hide Available Dates" title="Check Available Dates" onclick={handleCheckAvailableDates} class="slds-m-left_x-small">
+					</lightning-button></span>
+			</Template>
 		</div>
-	
+		<template if:true={showAvailability}>
+			<br>
+			<div style="display:flex;flex-wrap: wrap;justify-content:space-around;" class="slds-box slds-box_x-small">
+
+					<template for:each={parsByUserIdMap} for:item="par">
+						<span key={par.Start_Date__c}>			
+							<div> <b>Start Date:</b> {par.Start_Date__c} &nbsp; <b>End Date:</b> {par.End_Date__c}</div>
+						</span>
+					</template>
+			</div>
+		</template>
 	</lightning-card>
 </template>

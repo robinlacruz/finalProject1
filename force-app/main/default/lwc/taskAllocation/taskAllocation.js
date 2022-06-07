@@ -4,6 +4,8 @@ import getResourcesByRole from "@salesforce/apex/ProjectResourcesHelper.getResou
 import getPARByUserAndDates from "@salesforce/apex/ProjectResourcesHelper.getPARByUserAndDates";
 import insertTask from "@salesforce/apex/ProjectResourcesHelper.insertTask";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import getPARsByProjectIdAndUserId from "@salesforce/apex/ProjectResourcesHelper.getPARsByProjectIdAndUserId";
+//import getPARsByProjectIdAndRole from "@salesforce/apex/ProjectResourcesHelper.getPARsByProjectIdAndRole";
 
 export default class TaskAllocation extends LightningElement {
   @api recordId;
@@ -22,6 +24,8 @@ export default class TaskAllocation extends LightningElement {
   ];
 
   optionsResourcesFlag = true;
+  parsByUserIdMap = [];
+  showAvailability = false;
   @track fields = {
     summary: "",
     description: "",
@@ -165,6 +169,57 @@ export default class TaskAllocation extends LightningElement {
       role: "Architect",
       priority: ""
     };
+  }
+
+  /* handleCheckAvailableDates() {
+    if (!this.showAvailability) {
+      getPARsByProjectIdAndRole({
+        projectId: this.recordId,
+        role: this.fields.role
+      })
+        .then((data) => {
+          data = JSON.parse(JSON.stringify(data));
+          console.log("data --->", data);
+          let mapData = [];
+          let conts = data;
+          for (let key in conts) {
+            mapData.push({
+              value: conts[key].length > 0 ? conts[key] : null,
+              key: key
+            });
+          }
+          this.parsByUserIdMap = mapData;
+          console.log("this.parsByUserIdMap", this.parsByUserIdMap);
+          this.showAvailability = true;
+        })
+        .catch((error) => {
+          console.log(
+            "There was an error retrieving available dates for resources",
+            error
+          );
+        });
+    } else {
+      this.showAvailability = false;
+    }
+  } */
+
+  handleCheckAvailableDates() {
+    if (!this.showAvailability) {
+      getPARsByProjectIdAndUserId({
+        projectId: this.recordId,
+        userId: this.fields.resourceId
+      })
+        .then((data) => {
+          console.log("data ->", data);
+          this.parsByUserIdMap = data;
+        })
+        .catch((error) => {
+          console.log("There was an error retrieving available dates");
+        });
+      this.showAvailability = true;
+    } else {
+      this.showAvailability = false;
+    }
   }
 
   showErrorToast(title, message, variant) {
