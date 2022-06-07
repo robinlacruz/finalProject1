@@ -1,13 +1,14 @@
 <template>
-    <lightning-card class="slds-m-left_xx-small">
-        <template if:true={userTasks}>
-            <template for:each={userTasks} for:item="projectTasks">
-                <div key={userTasks.id}>
-                    <h1 style = "color:slategrey;font-size:16px">{projectTasks.project}</h1>
-                    <c-project-tasks current-project-tasks ={projectTasks.tasks}></c-project-tasks>
-                </div>
-            </template> 
-        </template>
-    </lightning-card>
-   
+    <div class="slds-p-around_medium">
+        <lightning-card>
+            <template if:true={userTasks}>
+                <template for:each={userTasks} for:item="projectTasks">
+                    <div key={userTasks.id}>
+                        <h1 style = "color:slategrey;font-size:16px">{projectTasks.project}</h1>
+                        <c-project-tasks current-project-tasks ={projectTasks.tasks}></c-project-tasks>
+                    </div>
+                </template> 
+            </template>
+        </lightning-card>
+    </div>
 </template>
