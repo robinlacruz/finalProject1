@@ -6,6 +6,10 @@
 				<lightning-card>
 					<div class="slds-m-around_x-small">
 						<div class="slds-align_absolute-center">
+							<lightning-combobox name="project" value={fields.projectId} placeholder="Select project"
+								options={optionsProject} onchange={handleFieldsChange}></lightning-combobox>
+						</div>
+						<div class="slds-align_absolute-center">
 							<lightning-radio-group name="role" label="Role" options={optionsRole} value={fields.role} type="radio"
 								onchange={handleFieldsChange}>
 							</lightning-radio-group>
