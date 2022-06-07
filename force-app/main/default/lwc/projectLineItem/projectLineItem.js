@@ -51,6 +51,8 @@ export default class ProjectLineItem extends LightningElement {
   endDateFilter;
   filterFlag = false;
   draftValuesMap = {};
+  availabilityByUserIdsMap = [];
+  showAvailability = false;
 
   @wire(getProjectLineItem, { pliId: "$pliId" })
   receivedProjectLineItem(result) {
@@ -102,6 +104,7 @@ export default class ProjectLineItem extends LightningElement {
     setTimeout(() => {
       eval("$A.get('e.force:refreshView').fire();");
     }, 500);
+    this.showAvailability = false;
     this.draftValues = [];
     this.startDateFilter = null;
     this.endDateFilter = null;
@@ -220,5 +223,33 @@ export default class ProjectLineItem extends LightningElement {
     this.startDateFilter = null;
     this.endDateFilter = null;
     if (this.filterFlag) this.getResources(this.projectLineItem.Role__c);
+  }
+
+  handleResourcesAvailability() {
+    if (this.showAvailability) {
+      this.showAvailability = false;
+    } else {
+      getResourcesAvailability({
+        projectId: this.projectLineItem.Project__c,
+        projectStartDate: this.projectStartDate,
+        projectEndDate: this.projectEndDate,
+        role: this.projectLineItem.Role__c
+      })
+        .then((data) => {
+          data = JSON.parse(JSON.stringify(data));
+          let mapData = [];
+          let conts = data;
+          for (let key in conts) {
+            mapData.push({
+              value: conts[key].length > 0 ? conts[key] : null,
+              key: this.resourcesById[key].Name
+            });
+          }
+          this.availabilityByUserIdsMap = mapData;
+          console.log(this.availabilityByUserIdsMap);
+          this.showAvailability = true;
+        })
+        .catch(console.log("Error retrieving resourcesAvailability"));
+    }
   }
 }

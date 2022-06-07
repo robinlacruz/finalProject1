@@ -47,7 +47,7 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=true) // testeado
     public static Project_Line_Item__c getProjectLineItem(Id pliId) {
-        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Estimated_Amount__c, Assigned_Amount__c, Current_Hours__c, Assigned_Hours__c FROM Project_Line_Item__c WHERE Id =: pliId LIMIT 1];
+        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Estimated_Amount__c, Assigned_Amount__c, Current_Hours__c, Assigned_Hours__c, Project__c FROM Project_Line_Item__c WHERE Id =: pliId LIMIT 1];
     }
 
 
@@ -226,8 +226,8 @@ public with sharing class ProjectResourcesHelper {
     }
 
     @AuraEnabled
-    public static Project_Assigned_Resource__c getPARByUserAndDates(Id userId, Date startDate, Date endDate){
-        List<Project_Assigned_Resource__c> PARs = [SELECT Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE User__c =: userId AND (Start_Date__c <= :startDate AND End_Date__c >= :endDate)];
+    public static Project_Assigned_Resource__c getPARByUserAndDates(Id userId, Date startDate, Date endDate, Id projectId){
+        List<Project_Assigned_Resource__c> PARs = [SELECT Start_Date__c, End_Date__c, User__r.Name FROM Project_Assigned_Resource__c WHERE User__c =: userId AND (Start_Date__c <= :startDate AND End_Date__c >= :endDate) AND Project_Line_Item__r.Project__c =: projectId];
         if(PARs.size()>0){
             return PARs[0];
         } else {
@@ -314,9 +314,10 @@ public with sharing class ProjectResourcesHelper {
         }
     }
     @AuraEnabled
-    public static Map<Id,List<DatesWrapper>> getResourcesAvailability(Id projectId, Date projectStartDate, Date projectEndDate){
+    public static Map<Id,List<DatesWrapper>> getResourcesAvailability(Id projectId, Date projectStartDate, Date projectEndDate, String role){
        // Project__c project = [SELECT Start_Date__c,End_Date__c FROM Project__c WHERE Id =: projectId];
-        List<Project_Assigned_Resource__c> PARsList = [SELECT User__c, User__r.Name, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Start_Date__c <= :projectEndDate AND End_Date__c >= :projectStartDate AND End_Date__c >= :Date.today() ORDER BY Start_Date__c];
+        List<Project_Assigned_Resource__c> PARsList = [SELECT User__c, User__r.Name, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Start_Date__c <= :projectEndDate AND User__r.Role__c =: role AND End_Date__c >= :projectStartDate AND End_Date__c >= :Date.today() ORDER BY Start_Date__c];
+        // Creates a map with user Ids keys and lists of Project_Assigned_Resources__c as values 
         Map<Id,List<Project_Assigned_Resource__c>> PARsByUserIdMap = new Map<Id,List<Project_Assigned_Resource__c>>();
         for (Project_Assigned_Resource__c par : PARsList) {
             List<Project_Assigned_Resource__c> assignedPARs = new List<Project_Assigned_Resource__c>();
@@ -326,7 +327,7 @@ public with sharing class ProjectResourcesHelper {
             assignedPARs.add(par);
             PARsByUserIdMap.put(par.User__c,assignedPARs);
         }
-
+        // Creates a map with user Ids as keys and lists of available dates (startDate - endDate) as values 
         Map<Id,List<DatesWrapper>> availDatesByUserId = new Map<Id,List<DatesWrapper>>();
         for (Id userId : PARsByUserIdMap.keySet()) {
             List<DatesWrapper> availableDatesList = new List<DatesWrapper>();
@@ -339,6 +340,10 @@ public with sharing class ProjectResourcesHelper {
                     if(PARsByUserIdMap.get(userId)[i].End_Date__c < projectEndDate){
                         availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i].End_Date__c+1, projectEndDate));
                     }
+                    if(PARsByUserIdMap.get(userId)[i].Start_Date__c > PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1){
+                        availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1, PARsByUserIdMap.get(userId)[i].Start_Date__c - 1));
+                    }
+
                 } else {
                     if(PARsByUserIdMap.get(userId)[i].Start_Date__c > PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1){
                         availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1, PARsByUserIdMap.get(userId)[i].Start_Date__c - 1));

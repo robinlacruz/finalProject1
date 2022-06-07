@@ -10,29 +10,53 @@
                 
                     <div >
                         <h2 class="slds-p-horizontal_small" style="font-weight:bold; font-size: 1em;">&nbsp;&nbsp;&nbsp;Filter Resources By Dates Availability</h2>
-                        <lightning-layout>
-                            <lightning-layout-item padding="horizontal-small">
+                        <div style="display:flex;flex-wrap: wrap;justify-content:space-around;">
+                            <div>
                                 <div class="header-column">
-                                    <lightning-input type="date" name="startDateFilter" label="Start Date Filter" value={startDateFilter} onchange={handleChangeFilter} placeholder="Start Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
+                                    <lightning-input type="date" name="startDateFilter"  value={startDateFilter} onchange={handleChangeFilter} placeholder="Start Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
                                 </div>
-                            </lightning-layout-item>      
-                            <lightning-layout-item padding="horizontal-small">
+                            </div>      
+                            <div>
                                 <div class="header-column">
-                                    <lightning-input type="date" name="endDateFilter" label="End Date Filter" value={endDateFilter} onchange={handleChangeFilter} placeholder="End Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
+                                    <lightning-input type="date" name="endDateFilter"  value={endDateFilter} onchange={handleChangeFilter} placeholder="End Date" min={projectStartDate} max={projectEndDate} ></lightning-input>
                                 </div>
-                            </lightning-layout-item>
-                            <lightning-layout-item padding="horizontal-small">
+                            </div>
+                            <div>
                                 <br>
                                 <lightning-button variant="brand" label="Filter Resources" title="Primary action" onclick={handleFilter} class="slds-m-left_x-small"></lightning-button>
-                            </lightning-layout-item>
-                            <lightning-layout-item padding="horizontal-small">
+                            </div>
+                            <div>
                                 <br>
                                 <lightning-button variant="brand-outline" label="Clear Filter" title="Primary action" onclick={handleCancelFilter} class="slds-m-left_x-small"></lightning-button>
-                            </lightning-layout-item>
-                        </lightning-layout>
+                            </div>
+                            <div>
+                                <br>
+                                <span if:false={showAvailability}><lightning-button variant="brand" label="Show Resources Availability" title="Primary action" onclick={handleResourcesAvailability} class="slds-m-left_x-small"></lightning-button></span>
+                                <span if:true={showAvailability}><lightning-button variant="brand" label="Hide Resources Availability" title="Primary action" onclick={handleResourcesAvailability} class="slds-m-left_x-small"></lightning-button></span>
+                            </div>
+                        </div>
                         
                     </div>
-                    
+                    <template if:true={showAvailability}>
+                        <br>
+                        <div style="display:flex;flex-wrap: wrap;justify-content:space-around;" class="slds-box slds-box_x-small">
+                            <template for:each={availabilityByUserIdsMap} for:item="map">
+                                <span key={map.key}>
+                                    <lightning-card  title={map.key}>
+                                                <template if:true={map.value} for:each={map.value} for:item="val">
+                                                    <div key={val.startDate}>
+                                                        <div> <b>Start Date:</b> {val.startDate} &nbsp; <b>End Date:</b> {val.endDate}</div>
+                                                    </div>
+                                                </template> 
+                                                <template if:false={map.value}>
+                                                    <div> Not available dates for this project </div>
+                                                </template>
+                                    </lightning-card>
+                                </span>
+                            </template>
+                        </div>
+                    </template>
+
                     <template if:true={resources}>
                         <div class="slds-p-around_small">
                             <lightning-datatable
