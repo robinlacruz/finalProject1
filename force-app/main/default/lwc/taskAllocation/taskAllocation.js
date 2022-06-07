@@ -20,7 +20,7 @@ export default class TaskAllocation extends LightningElement {
     optionsPriority = [{label : 'High' ,value:'High'},{label : 'Normal' ,value:'Normal'},{label : 'Low' ,value:'Low'}];
 
     optionsResourcesFlag = true;
-    @track fields  = {summary: '',description: '', startDate : null,endDate : null, nOfHours : 0 , projectId : null, resourceId : this.selectedResource , role : this.selectedRole, priority : this.selectedPriority};
+    @track fields  = {summary: '',description: '', startDate : null,endDate : null, nOfHours : 0 , projectId : null, resourceId : this.selectedResource , role : 'Architect', priority : this.priority};
 
     @wire (getProjectAndPLIs,{projectId:'$recordId'})
     receivedProject(result){
@@ -40,7 +40,7 @@ export default class TaskAllocation extends LightningElement {
         }
     }
   
-    @wire (getResourcesByRole, {role : '$selectedRole'})
+    @wire (getResourcesByRole, {role : '$fields.role'})
     receivedResources(result){
         const {data,error} = result;
 
@@ -69,30 +69,35 @@ export default class TaskAllocation extends LightningElement {
          if(name == 'endDate')    this.fields.endDate = value;
          if(name == 'nOfHours')   this.fields.nOfHours = value;
          if(name == 'priority')   this.fields.priority = value;
-         if(name == 'role')       {this.fields.role = value;this.selectedRole = value;}
+         if(name == 'role')       {this.fields.role = value;}
  
          if(name =='resource') {
              this.fields.resourceId = value;
          }
          
-         console.log(value);
+         console.log(JSON.stringify(this.fields));
      }
 
      handleCreateTask(evt){
         let par = null;
-        getPARByUserAndDates({userId : this.fields.resourceId ,startDate : this.fields.startDate, endDate : this.fields.endDate}).then(data=>{
+        getPARByUserAndDates({
+            userId : this.fields.resourceId ,
+            startDate : this.fields.startDate, 
+            endDate : this.fields.endDate, 
+            projectId : this.recordId}).then(data=>{
                 par = data;
                 let task;
                 if(true){
+                   console.log(par);
                     const {summary,startDate,endDate,description,nOfHours,priority} = this.fields;
                     task = {
                         Subject__c:summary,
                         Status__c:'Not started',
                         Start_Date__c:startDate,
                         End_Date__c:endDate,
-                        Name : 'Martin',//par.User__r.Name,
+                        Name : par.User__r.Name,
                         Project_Assigned_Resource__c : par.Id,
-                        Priority__c : priority, // Crear campo
+                        Priority__c : priority,
                         Description__c : description,
                         Allocated_Hours__c:nOfHours,
                         Registered_Hours__c : 0
@@ -104,6 +109,7 @@ export default class TaskAllocation extends LightningElement {
                 }
 
                 insertTask({task: task}).then(data=>{
+                    this.fields  = {summary: '',description: '', startDate : null,endDate : null, nOfHours : 0 , projectId : null, resourceId :  '', role : 'Architect' , priority : ''};
                     this.showErrorToast('Success','Task succesfully inserted','success');
                 
 
@@ -115,13 +121,14 @@ export default class TaskAllocation extends LightningElement {
             this.showErrorToast('Error',error.body.message,'error');
         })
 
-      
 
-
-        //this.fields = {summary: '',description: '', startDate : null,endDate : null, nOfHours : 0 , projectId : null, resourceId : this.selectedResource , role : this.selectedRole, priority : this.selectedPriority};
-            
         
     }
+
+    handleCancelTask(){
+        this.fields  = {summary: '',description: '', startDate : null,endDate : null, nOfHours : 0 , projectId : null, resourceId :  '', role : 'Architect' , priority : ''};
+    }
+
         
     showErrorToast(title,message,variant) {
         const evt = new ShowToastEvent({
@@ -133,68 +140,3 @@ export default class TaskAllocation extends LightningElement {
         this.dispatchEvent(evt);
     }
 }
-    
-
-/*import RESOURCETASK_OBJECT from '@salesforce/schema/Resource_Task__c';
-import NAME_FIELD from '@salesforce/schema/Resource_Task__c.name';
-import SUBJECT_FIELD from '@salesforce/schema/Resource_Task__c.Subject__c';
-import PRIORITY_FIELD from '@salesforce/schema/Resource_Task__c.Priority__c';
-import STATUS_FIELD from '@salesforce/schema/Resource_Task__c.Status__c';
-import STARTDATE_FIELD from '@salesforce/schema/Resource_Task__c.Start_Date__c';
-import ENDATE_FIELD from '@salesforce/schema/Resource_Task__c.End_Date__c';
-import PAR_FIELD from '@salesforce/schema/Resource_Task__c.Project_Assigned_Resource__c';
-import DESCRIPTION_FIELD from '@salesforce/schema/Resource_Task__c.Description__c';
-import ALLOCATEDHOURS_FIELD from '@salesforce/schema/Resource_Task__c.Allocated_Hours__c'*/
-
-/*import PRIORITY_FIELD from '@salesforce/schema/Resource_Task__c.Priority__c';
-import STATUS_FIELD from '@salesforce/schema/Resource_Task__c.Status__c';
-import STARTDATE_FIELD from '@salesforce/schema/Resource_Task__c.Start_Date__c';
-import ENDATE_FIELD from '@salesforce/schema/Resource_Task__c.End_Date__c';
-import PAR_FIELD from '@salesforce/schema/Resource_Task__c.Project_Assigned_Resource__c';
-import DESCRIPTION_FIELD from '@salesforce/schema/Resource_Task__c.Description__c';
-import ALLOCATEDHOURS_FIELD from '@salesforce/schema/Resource_Task__c.Allocated_Hours__c'
-     handleCreateTask() {
-        const fieldsUI = {};
-        fields[NAME_FIELD.fieldApiName] = this.name;
-        fields[SUBJECT_FIELD.fieldApiName] = this.fields.summary
-        fields[PRIORITY_FIELD.fieldApiName] = this.name;
-        fields[STARTDATE_FIELD.fieldApiName] = this.name;
-        fields[ENDATE_FIELD.fieldApiName] = this.name;
-        fields[PAR_FIELD.fieldApiName] = this.name;
-        fields[DESCRIPTION_FIELD.fieldApiName] = this.name;
-        fields[ALLOCATEDHOURS_FIELD.fieldApiName] = this.name;
-        const recordInput = { apiName: RESOURCETASK_OBJECT.objectApiName, fieldsUI };
-        createRecord(recordInput)
-            .then(account => {
-                this.accountId = account.id;
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Success',
-                        message: 'Account created',
-                        variant: 'success',
-                    }),
-                );
-            })
-            /* task = {
-                        Subject__c:summary,
-                        Status__c:'Not started',
-                        Start_Date__c:startDate,
-                        End_Date__c:endDate,
-                        Name : 'Martin',//par.User__r.Name,
-                        Project_Assigned_Resource__c : par.Id,
-                        Priority__c : 'Normal', // Crear campo
-                        Description__c : description,
-                        Allocated_Hours__c:nOfHours 
-                    }
-            .catch(error => {
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Error creating record',
-                        message: error.body.message,
-                        variant: 'error',
-                    }),
-                );
-            });
-    }
-
-    */

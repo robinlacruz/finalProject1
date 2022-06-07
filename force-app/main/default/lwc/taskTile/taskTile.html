@@ -1,33 +1,56 @@
-<template>
-    <!-- Row 1 -->
-    <template if:false={taskIsCompleted}>
+<template> 
+<template if:false={taskIsCompleted}>
     <lightning-card>
-        <div class="slds-grid slds-wrap">
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_2-of-12 slds-large-size_2-of-12">
+        <div class="slds-grid slds-wrap slds-box slds-box_x-small" >
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_2-of-12 slds-large-size_2-of-12 slds-align_absolute-center" >
                 <span class="custom-box">{task.Subject__c}</span>
             </div>
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12 slds-align_absolute-center">
                 <span class="custom-box">{task.Status__c}</span>
             </div>
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_2-of-12 slds-large-size_2-of-12 slds-align_absolute-center" >
                 <span class="custom-box">{task.Allocated_Hours__c}</span>
             </div>
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_1-of-12 slds-large-size_1-of-12">
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_2-of-12 slds-large-size_2-of-12 slds-align_absolute-center">
                 <span class="custom-box">{task.Registered_Hours__c}</span>
             </div>
-            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_7-of-12 slds-large-size_7-of-12">
-                <span class="custom-box">
-                    <div if:true ={taskIsStarted}>
-                        <lightning-input type="number" name="loadHours" label="Load hours" placeholder="enter hours" value={hours} onchange={handleInput}></lightning-input> 
+            <div class="slds-col slds-small-size_12-of-12 slds-medium-size_5-of-12 slds-large-size_5-of-12 slds-align_absolute-center">
+                <div class="custom-box slds-wrap">
+                    <div if:true ={taskIsStarted} class="slds-align_absolute-center">
+                        <input type="number" name="loadHours" placeholder="enter hours" value={hours} onchange={handleInput}></input> 
                         <lightning-button label="Load hours" title="Load hours" onclick={handleLoadHours} class="slds-m-left_x-small"></lightning-button>
                         <lightning-button label="Mark as completed" title="Mark as completed" onclick={handleMarkCompleted} class="slds-m-left_x-small"></lightning-button>
                     </div>
                     <div if:false={taskIsStarted}>
                         <lightning-button label="Start Task" title="Non-primary action" onclick={handleStartTask} class="slds-m-left_x-small"></lightning-button>
                     </div>
-                </span>
+                </div>
             </div>
         </div>
     </lightning-card>
+</template> 
+</template> 
+   <!--
+<template>
+<template if:false={taskIsCompleted}>
+            <tr class="slds-hint-parent">
+                <th data-label="Task" scope="row">
+                    <div class="slds-truncate" title="Cloudhub">
+                        <a href="#" tabindex="-1">{task.Subject__c}</a>
+                    </div>
+                </th>
+                <td data-label="Status">
+                    <div class="slds-truncate" title={task.Status__c}>{task.Status__c}</div>
+                </td>
+                <td data-label="Estimated hours">
+                    <div class="slds-truncate" title={task.Allocated_Hours__c}>{task.Allocated_Hours__c}</div>
+                </td>
+                <td data-label="Record of hours">
+                    <div class="slds-truncate" title={task.Registered_Hours__c}>{task.Registered_Hours__c}</div>
+                </td>
+                <td data-label="Actions">
+                    
+                </td>
+            </tr>
 </template>
-</template>
+</template>-->

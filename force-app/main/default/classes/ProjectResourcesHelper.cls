@@ -1,24 +1,6 @@
 public with sharing class ProjectResourcesHelper {
 
     public class My1Exception extends Exception {}
-	
-    /* @AuraEnabled(cacheable=true)
-    public static Map<String,List<User>> getResourcesByRoleMap() {
-        List<User> users = [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null];
-        Map<String,List<User>> resourcesByRole = new Map<String,List<User>>();
-        for(User resource: users){
-            if(resourcesByRole.get(resource.Role__c)!=null){
-                List<User> resources = resourcesByRole.get(resource.Role__c);
-                resources.add(resource);
-                resourcesByRole.put(resource.Role__c, resources);
-            } else {
-                List<User> resources = new List<User>();
-                resources.add(resource);
-                resourcesByRole.put(resource.Role__c, resources);
-            }
-        }
-        return resourcesByRole;
-    } */
 
     @AuraEnabled(cacheable=false) //testeado
     public static List<User> getResourcesByRoleAndDate(String role, Date startDate, Date endDate) {
@@ -53,7 +35,6 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=false) // testeado
     public static String insertPARs(List<Project_Assigned_Resource__c>  resources){
-        system.debug('dentro de insertPARs');
         List<Project_Assigned_Resource__c> resourcesList = new List<Project_Assigned_Resource__c>();
         try{
            
@@ -156,16 +137,6 @@ public with sharing class ProjectResourcesHelper {
         String dayOfEndDate= getDayOfWeek(endDate);
 
         // Valida que las fechas no sean sabado o domingo
-        
-        /* if(dayOfStartDate == 'Saturday' || dayOfStartDate == 'Sunday'){
-                if(dayOfEndDate =='Saturday' || dayOfEndDate == 'Sunday'){
-                    error='No se pueden asignar dias no laborales como fecha de termino del proyecto para '+resourceName ;
-                    return error;
-                }
-            error='No se pueden asignar dias no laborales como fecha de inicio del proyecto para '+resourceName;
-            return error;		
-        } */
-
         Date projectStartDate = currentPLI.Project__r.Start_Date__c; 
         Date projectEndDate = currentPLI.Project__r.End_Date__c;
 
@@ -216,7 +187,6 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled
     public static void insertTask(Resource_Task__c task){
-        system.debug('dentro de insertTask');
         try{
             insert task;
         } catch(DmlException e){
@@ -225,8 +195,8 @@ public with sharing class ProjectResourcesHelper {
     }
 
     @AuraEnabled
-    public static Project_Assigned_Resource__c getPARByUserAndDates(Id userId, Date startDate, Date endDate){
-        List<Project_Assigned_Resource__c> PARs = [SELECT Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE User__c =: userId AND (Start_Date__c <= :startDate AND End_Date__c >= :endDate)];
+    public static Project_Assigned_Resource__c getPARByUserAndDates(Id userId, Date startDate, Date endDate, Id projectId){
+        List<Project_Assigned_Resource__c> PARs = [SELECT Start_Date__c, End_Date__c,User__r.Name FROM Project_Assigned_Resource__c WHERE User__c =: userId AND (Start_Date__c <= :startDate AND End_Date__c >= :endDate) AND Project_Line_Item__r.Project__c = : projectId];
         if(PARs.size()>0){
             return PARs[0];
         } else {

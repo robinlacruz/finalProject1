@@ -14,7 +14,6 @@ export default class UserTasks extends LightningElement {
         let projectTasks = [];
         let keyP;
         for (let j in data[i]) {
-          console.log("for interno de getUserTasks");
           console.log(data[i][j]);
           projectTasks.push(data[i][j]);
           keyP = data[i][j].Project_Assigned_Resource__c;
