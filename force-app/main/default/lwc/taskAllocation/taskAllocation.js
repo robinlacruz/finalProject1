@@ -1,10 +1,11 @@
+/* eslint-disable guard-for-in */
 import { LightningElement, api, wire, track } from "lwc";
 import getProjectAndPLIs from "@salesforce/apex/ProjectResourcesHelper.getProjectAndPLIs";
-import getResourcesByRole from "@salesforce/apex/ProjectResourcesHelper.getResourcesByRole";
 import getPARByUserAndDates from "@salesforce/apex/ProjectResourcesHelper.getPARByUserAndDates";
 import getProjectsOfCurrentUser from "@salesforce/apex/ProjectResourcesHelper.getProjectsOfCurrentUser";
 import insertTask from "@salesforce/apex/ProjectResourcesHelper.insertTask";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import getResourcesByRoleAndProject from "@salesforce/apex/ProjectResourcesHelper.getResourcesByRoleAndProject";
 
 export default class TaskAllocation extends LightningElement {
   @api recordId;
@@ -57,7 +58,6 @@ export default class TaskAllocation extends LightningElement {
   receivedProject(result) {
     const { data, error } = result;
     if (data) {
-      console.log(data);
       this.fields.projectId = data.Id;
       this.projectLineItems = data.Project_Line_Items__r;
       this.optionsRole = data.Project_Line_Items__r.map((element) => {
@@ -70,17 +70,11 @@ export default class TaskAllocation extends LightningElement {
     }
   }
 
-  @wire(getResourcesByRole, { role: "$fields.role" })
+  @wire(getResourcesByRoleAndProject, { role: "$fields.role", projectId:"$fields.projectId" })
   receivedResources(result) {
     const { data, error } = result;
-
     if (data) {
-      const arrAux = [];
-      data = {'Usuario4' : 'info','Usuario3' : 'info2'};
-      for(let key in data){
-        arrAux.push(key);
-      }
-      this.optionsResources = arrAux.map((element) => {
+      this.optionsResources = data.map((element) => {
         return { label: element.Name, value: element.Id };
       });
     } else if (error) {
@@ -95,25 +89,24 @@ export default class TaskAllocation extends LightningElement {
   handleFieldsChange(evt) {
     const name = JSON.parse(JSON.stringify(evt.target.name));
     const value = JSON.parse(JSON.stringify(evt.target.value));
-    if (name == "summary") this.fields.summary = value;
-    if (name == "description") this.fields.description = value;
-    if (name == "startDate") this.fields.startDate = value;
-    if (name == "endDate") this.fields.endDate = value;
-    if (name == "nOfHours") this.fields.nOfHours = value;
-    if (name == "priority") this.fields.priority = value;
-    if (name == "project") this.fields.projectId = value;
-    if (name == "role") {
+    if (name === "summary") this.fields.summary = value;
+    if (name === "description") this.fields.description = value;
+    if (name === "startDate") this.fields.startDate = value;
+    if (name === "endDate") this.fields.endDate = value;
+    if (name === "nOfHours") this.fields.nOfHours = value;
+    if (name === "priority") this.fields.priority = value;
+    if (name === "project") this.fields.projectId = value;
+    if (name === "role") {
       this.fields.role = value;
     }
-
-    if (name == "resource") {
+    if (name === "resource") {
       this.fields.resourceId = value;
     }
 
     console.log(JSON.stringify(this.fields));
   }
 
-  handleCreateTask(evt) {
+  handleCreateTask() {
     let par = null;
     getPARByUserAndDates({
       userId: this.fields.resourceId,
@@ -124,15 +117,7 @@ export default class TaskAllocation extends LightningElement {
       .then((data) => {
         par = data;
         let task;
-        if (true) {
-          const {
-            summary,
-            startDate,
-            endDate,
-            description,
-            nOfHours,
-            priority
-          } = this.fields;
+          const {summary,startDate,endDate,description,nOfHours,priority} = this.fields;
           task = {
             Subject__c: summary,
             Status__c: "Not started",
@@ -148,10 +133,10 @@ export default class TaskAllocation extends LightningElement {
 
           console.log(task);
           console.log("task arriba");
-        }
+        
 
         insertTask({ task: task })
-          .then((data) => {
+          .then(() => {
             this.fields = {
               summary: "",
               description: "",

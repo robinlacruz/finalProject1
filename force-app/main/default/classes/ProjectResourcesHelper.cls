@@ -1,6 +1,30 @@
 public with sharing class ProjectResourcesHelper {
 
     public class My1Exception extends Exception {}
+	
+    /* @AuraEnabled(cacheable=true)
+    public static Map<String,List<User>> getResourcesByRoleMap() {
+        List<User> users = [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null];
+        Map<String,List<User>> resourcesByRole = new Map<String,List<User>>();
+        for(User resource: users){
+            if(resourcesByRole.get(resource.Role__c)!=null){
+                List<User> resources = resourcesByRole.get(resource.Role__c);
+                resources.add(resource);
+                resourcesByRole.put(resource.Role__c, resources);
+            } else {
+                List<User> resources = new List<User>();
+                resources.add(resource);
+                resourcesByRole.put(resource.Role__c, resources);
+            }
+        }
+        return resourcesByRole;
+    } */
+
+    @AuraEnabled(cacheable=true)
+    public static List<Project__c> getProjectsOfCurrentUser(){
+        Id userId = UserInfo.getUserId();
+        return [SELECT id,Name,Squad_Lead__c FROM Project__c];
+    }
 
     @AuraEnabled(cacheable=false) //testeado
     public static List<User> getResourcesByRoleAndDate(String role, Date startDate, Date endDate) {
@@ -17,6 +41,21 @@ public with sharing class ProjectResourcesHelper {
         return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c =: role AND Role__c != null];
     }    
 
+    @AuraEnabled(cacheable=true) //testeado
+    public static List<User> getResourcesByRoleAndProject(String role, Id projectId) {
+
+        List<Project_Assigned_Resource__c> pars = [SELECT id, Project_Line_Item__r.Role__c, Project_Line_Item__r.Project__c, User__c FROM Project_Assigned_Resource__c 
+                                                WHERE Project_Line_Item__r.Role__c =:role AND Project_Line_Item__r.Project__c =:projectId];
+        Set<Id> idsToQuery = new Set<Id>();
+       
+        for(Project_Assigned_Resource__c par : pars){
+            system.debug(par);
+            idsToQuery.add(par.User__c);
+        }
+        return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null AND Role__c =:role AND Id IN :idsToquery];
+    }    
+
+
     @AuraEnabled(cacheable=false) // testeado
     public static Map<Id,User> getResourcesByIdMap(List<User> resources){
         return new Map<Id,User>(resources);
@@ -29,12 +68,13 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=true) // testeado
     public static Project_Line_Item__c getProjectLineItem(Id pliId) {
-        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Estimated_Amount__c, Assigned_Amount__c, Current_Hours__c, Assigned_Hours__c FROM Project_Line_Item__c WHERE Id =: pliId LIMIT 1];
+        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Estimated_Amount__c, Assigned_Amount__c, Current_Hours__c, Assigned_Hours__c, Project__c FROM Project_Line_Item__c WHERE Id =: pliId LIMIT 1];
     }
 
 
     @AuraEnabled(cacheable=false) // testeado
     public static String insertPARs(List<Project_Assigned_Resource__c>  resources){
+        system.debug('dentro de insertPARs');
         List<Project_Assigned_Resource__c> resourcesList = new List<Project_Assigned_Resource__c>();
         try{
            
@@ -118,6 +158,7 @@ public with sharing class ProjectResourcesHelper {
                 item.addError(error);
         }
     }
+
     public static String validateAssignedDates(String resourceName, Date startDate,Date endDate,Project_Line_Item__c currentPLI,List<Project_Assigned_Resource__c> userAssignedResources){
         String error;
         if(startDate==null || endDate ==null){
@@ -137,6 +178,16 @@ public with sharing class ProjectResourcesHelper {
         String dayOfEndDate= getDayOfWeek(endDate);
 
         // Valida que las fechas no sean sabado o domingo
+        
+        /* if(dayOfStartDate == 'Saturday' || dayOfStartDate == 'Sunday'){
+                if(dayOfEndDate =='Saturday' || dayOfEndDate == 'Sunday'){
+                    error='No se pueden asignar dias no laborales como fecha de termino del proyecto para '+resourceName ;
+                    return error;
+                }
+            error='No se pueden asignar dias no laborales como fecha de inicio del proyecto para '+resourceName;
+            return error;		
+        } */
+
         Date projectStartDate = currentPLI.Project__r.Start_Date__c; 
         Date projectEndDate = currentPLI.Project__r.End_Date__c;
 
@@ -187,6 +238,7 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled
     public static void insertTask(Resource_Task__c task){
+        system.debug('dentro de insertTask');
         try{
             insert task;
         } catch(DmlException e){
@@ -196,7 +248,7 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled
     public static Project_Assigned_Resource__c getPARByUserAndDates(Id userId, Date startDate, Date endDate, Id projectId){
-        List<Project_Assigned_Resource__c> PARs = [SELECT Start_Date__c, End_Date__c,User__r.Name FROM Project_Assigned_Resource__c WHERE User__c =: userId AND (Start_Date__c <= :startDate AND End_Date__c >= :endDate) AND Project_Line_Item__r.Project__c = : projectId];
+        List<Project_Assigned_Resource__c> PARs = [SELECT Start_Date__c, End_Date__c, User__r.Name FROM Project_Assigned_Resource__c WHERE User__c =: userId AND (Start_Date__c <= :startDate AND End_Date__c >= :endDate) AND Project_Line_Item__r.Project__c =: projectId];
         if(PARs.size()>0){
             return PARs[0];
         } else {
@@ -283,9 +335,10 @@ public with sharing class ProjectResourcesHelper {
         }
     }
     @AuraEnabled
-    public static Map<Id,List<DatesWrapper>> getResourcesAvailability(Id projectId, Date projectStartDate, Date projectEndDate){
+    public static Map<Id,List<DatesWrapper>> getResourcesAvailability(Id projectId, Date projectStartDate, Date projectEndDate, String role){
        // Project__c project = [SELECT Start_Date__c,End_Date__c FROM Project__c WHERE Id =: projectId];
-        List<Project_Assigned_Resource__c> PARsList = [SELECT User__c, User__r.Name, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Start_Date__c <= :projectEndDate AND End_Date__c >= :projectStartDate AND End_Date__c >= :Date.today() ORDER BY Start_Date__c];
+        List<Project_Assigned_Resource__c> PARsList = [SELECT User__c, User__r.Name, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Start_Date__c <= :projectEndDate AND User__r.Role__c =: role AND End_Date__c >= :projectStartDate AND End_Date__c >= :Date.today() ORDER BY Start_Date__c];
+        // Creates a map with user Ids keys and lists of Project_Assigned_Resources__c as values 
         Map<Id,List<Project_Assigned_Resource__c>> PARsByUserIdMap = new Map<Id,List<Project_Assigned_Resource__c>>();
         for (Project_Assigned_Resource__c par : PARsList) {
             List<Project_Assigned_Resource__c> assignedPARs = new List<Project_Assigned_Resource__c>();
@@ -295,7 +348,7 @@ public with sharing class ProjectResourcesHelper {
             assignedPARs.add(par);
             PARsByUserIdMap.put(par.User__c,assignedPARs);
         }
-
+        // Creates a map with user Ids as keys and lists of available dates (startDate - endDate) as values 
         Map<Id,List<DatesWrapper>> availDatesByUserId = new Map<Id,List<DatesWrapper>>();
         for (Id userId : PARsByUserIdMap.keySet()) {
             List<DatesWrapper> availableDatesList = new List<DatesWrapper>();
@@ -304,10 +357,19 @@ public with sharing class ProjectResourcesHelper {
                     if(PARsByUserIdMap.get(userId)[i].Start_Date__c>projectStartDate){
                         availableDatesList.add(new DatesWrapper(projectStartDate,PARsByUserIdMap.get(userId)[i].Start_Date__c-1));
                     }
+                    if(i==PARsByUserIdMap.get(userId).size()-1){
+                        if(PARsByUserIdMap.get(userId)[i].End_Date__c<projectEndDate){
+                            availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i].End_Date__c+1,projectEndDate));
+                        }
+                    }
                 } else if(i == PARsByUserIdMap.get(userId).size()-1){
                     if(PARsByUserIdMap.get(userId)[i].End_Date__c < projectEndDate){
                         availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i].End_Date__c+1, projectEndDate));
                     }
+                    if(PARsByUserIdMap.get(userId)[i].Start_Date__c > PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1){
+                        availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1, PARsByUserIdMap.get(userId)[i].Start_Date__c - 1));
+                    }
+
                 } else {
                     if(PARsByUserIdMap.get(userId)[i].Start_Date__c > PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1){
                         availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1, PARsByUserIdMap.get(userId)[i].Start_Date__c - 1));
@@ -324,12 +386,13 @@ public with sharing class ProjectResourcesHelper {
     public static Map<String,List<Resource_Task__c>> getUserTasks(){
         
         //Id userId = UserInfo.getUserId();
-        //martin brizuela->
-        Id userId = '0058a00000LGNZRAA5';
+        //Octavio ->
+        //Id userId = '0058a00000LgxtTAAR';
+        Id userId = '0058c00000BeCSBAA3';
         Set<Id> projectsID = new Set<Id>();
         
         try{
-            List<Project_Assigned_Resource__c> parList = [SELECT User__c,Project_Line_Item__r.Project__r.name,Project_Line_Item__r.Project__c,(SELECT Id,Project_Assigned_Resource__c,Subject__c,Status__c,Start_Date__c,Name,Priority__c,Description__c,Allocated_Hours__c,Registered_Hours__c FROM Resource_Tasks__r ORDER BY Status__c DESC) FROM Project_Assigned_Resource__c WHERE User__c =:userId];
+            List<Project_Assigned_Resource__c> parList = [SELECT User__c,Project_Line_Item__r.Project__r.name,Project_Line_Item__r.Project__c,(SELECT Id,Project_Assigned_Resource__c,Subject__c,Status__c,Start_Date__c,Name,Priority__c,Description__c,Allocated_Hours__c,Registered_Hours__c FROM Resource_Tasks__r ORDER BY Status__c DESC) FROM Project_Assigned_Resource__c WHERE User__c = :userId];
 
             Map<String,List<Resource_Task__c>> projectTasksMap = new Map<String,List<Resource_Task__c>>();        
                                               
