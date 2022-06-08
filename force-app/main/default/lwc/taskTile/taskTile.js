@@ -41,8 +41,7 @@ export default class TaskTile extends LightningElement {
     updateTask({ task: this.task })
       .then(() => {
         console.log("Task succesfully updated");
-      })
-      .catch((error) => {
+      }).catch((error) => {
         console.log("Error updating task ", error);
       });
   }
