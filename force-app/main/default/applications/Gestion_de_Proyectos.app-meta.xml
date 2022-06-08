@@ -10,11 +10,78 @@
     <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
     <label>Gestion de Proyectos</label>
     <navType>Standard</navType>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>out_of_office_Record_Page</content>
+        <formFactor>Small</formFactor>
+        <pageOrSobjectType>out_of_office__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Admin</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>out_of_office_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>out_of_office__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Admin</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>out_of_office_Record_Page</content>
+        <formFactor>Small</formFactor>
+        <pageOrSobjectType>out_of_office__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Project Manager</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>out_of_office_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>out_of_office__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Project Manager</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>out_of_office_Record_Page</content>
+        <formFactor>Small</formFactor>
+        <pageOrSobjectType>out_of_office__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Resource</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>out_of_office_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>out_of_office__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Resource</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>Tab</actionName>
+        <content>Home_Page_Default</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>standard-home</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Resource</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>Tab</actionName>
+        <content>Home_Page_Default</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>standard-home</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Admin</profile>
+    </profileActionOverrides>
     <tabs>Project__c</tabs>
     <tabs>Project_Line_Item__c</tabs>
     <tabs>Project_Assigned_Resource__c</tabs>
     <tabs>standard-Opportunity</tabs>
     <tabs>OpportunityLineItem__c</tabs>
+    <tabs>out_of_office__c</tabs>
+    <tabs>standard-AnalyticsDataManager</tabs>
+    <tabs>standard-home</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>Gestion_de_Proyectos_UtilityBar1</utilityBar>
 </CustomApplication>

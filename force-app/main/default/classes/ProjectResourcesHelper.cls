@@ -152,6 +152,8 @@ public with sharing class ProjectResourcesHelper {
     }
 
     //item.user__c,item.Start_Date__c,item.End_Date__c,item.Project_Line_Item__c
+    
+    //Método para validar que no haya 
     public static void validatePARs(List<Project_Assigned_Resource__c> PARsList){
 
         Set<Id> PLIIds = new Set<Id>();

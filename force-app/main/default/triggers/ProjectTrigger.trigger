@@ -7,14 +7,12 @@ trigger ProjectTrigger on Project__c (before update) {
                 String error = 'El proyecto debe tener todas las horas asignadas para cambiar su estado a In progress';
                 //EmailHelper.sendEmail(proj, error);
                 proj.addError(error);
-                
             }
 
             if(!ProjectResourcesHelper.isProfitable(proj)){
                 String error = 'El proyecto debe ser rentable para cambiar su estado a In progress ';
                 //EmailHelper.sendEmail(proj, error);
                 proj.addError(error);
-
             }
 
             if(!ProjectResourcesHelper.hasUniqueSquadLead(proj)){

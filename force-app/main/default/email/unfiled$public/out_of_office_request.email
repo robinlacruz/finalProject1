@@ -1,0 +1,3 @@
+El usuario {!User.FirstName} {!User.LastName} pide estar fuera de oficina entre las siguientes fechas {!out_of_office__c.start_date__c} y {!out_of_office__c.end_date__c}. Por favor, resuelva este pedido a la brevedad desde el siguiente link: {!ApprovalRequest.Internal_URL}.
+Sino, desde este otro 
+Muchas Gracias!

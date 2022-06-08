@@ -168,5 +168,21 @@
         <members>Resource_Task__c</members>
         <name>TopicsForObjects</name>
     </types>
+	<types>
+        <members>*</members>
+        <name>ApprovalProcess</name>
+    </types>
+	    <types>
+        <members>out_of_office__c</members>
+        <name>Workflow</name>
+    </types>
+	<types>
+        <members>MyDocumentFolder/MyDocumentName</members>
+        <name>Document</name>
+    </types>
+    <types>
+        <members>unfiled$public/out_of_office_request</members>
+        <name>EmailTemplate</name>
+    </types>
 	<version>53.0</version>
 </Package>
