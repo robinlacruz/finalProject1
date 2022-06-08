@@ -1,24 +1,9 @@
-/* eslint-disable guard-for-in */
 import { LightningElement, api, wire } from "lwc";
 import getUserTasks from "@salesforce/apex/ProjectResourcesHelper.getUserTasks";
 export default class UserTasks extends LightningElement {
   @api recordId;
   userTasks = [];
-  columnList = [
-    {label: 'Task', fieldName: 'Subject__c'},
-    {label: 'Status', fieldName: 'Status__c', type: 'text'},
-    {label: 'Estimated hours', fieldName: 'Allocated_Hours__c'},
-    {label: 'Registered hours', fieldName: 'Registered_Hours__c'},
-    {label : 'Actions',
-    type:"button", typeAttributes:{
-      label:'Start task',
-      name:'start_task',
-      title:'Start task',
-      disabled:false,
-      value:'Start task',
-      iconPosition:'left'
-    }}
-];
+
   @wire(getUserTasks, {})
   receivedUserTasks(result) {
     const { data, error } = result;
@@ -44,29 +29,6 @@ export default class UserTasks extends LightningElement {
       );
     }
   }
-
-
-
-
-  callRowAction( event ) {  
-          
-    const recId =  event.detail.row.Id;  
-    const actionName = event.detail.action.name;  
-    if ( actionName === 'start_task' ) {  
-
-        console.log('hol');
-
-    } else if ( actionName === 'View') {  
-
-          
-
-    }          
-
-} 
-
-handleStartTask() {
- 
-}
   /* connectedCallback() {
     getUserTasks({})
       .then((data) => {
@@ -96,5 +58,4 @@ handleStartTask() {
         const {data,error} = result;
         console.log(data);
     }*/
-
 }
