@@ -245,14 +245,44 @@ public with sharing class ProjectResourcesHelper {
     public static void validateTasks(List<Resource_Task__c> tasks){
         String error=null;
         Set<Id> PARsIds = new Set<Id>();
+        Set<Id> userIds = new Set<Id>();
         for (Resource_Task__c tsk : tasks) {
             PARsIds.add(tsk.Project_Assigned_Resource__c);
         }
-        Map<Id, Project_Assigned_Resource__c> PARsMap = new Map<Id, Project_Assigned_Resource__c>([SELECT Id, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Id IN :PARsIds]);
+        List<Project_Assigned_Resource__c> PARs = [SELECT Id, Start_Date__c, End_Date__c,User__c FROM Project_Assigned_Resource__c WHERE Id IN :PARsIds];
+        for(Project_Assigned_Resource__c par : PARs){
+            userIds.add(par.User__c);
+        }
+        system.debug('tasks ->'+tasks);
+        system.debug('userIds -> '+userIds);
+        List<out_of_office__c> oooffcs = [SELECT User__c, start_date__c, end_date__c FROM out_of_office__c WHERE User__c IN :userIds];
+        system.debug('oooffcs -> '+oooffcs);
+        //Create a Map with users Ids as keys and out_of_office lists as values
+        Map<Id,List<out_of_office__c>> oooffcsByUserId = new Map<Id,List<out_of_office__c>>();
+        for (out_of_office__c oooff : oooffcs) {
+            List<out_of_office__c> oooffList = new List<out_of_office__c>();
+            if(oooffcsByUserId.get(oooff.User__c)!=null){
+                oooffList.addAll(oooffcsByUserId.get(oooff.User__c));
+            }
+            oooffList.add(oooff);
+            oooffcsByUserId.put(oooff.User__c,oooffList);
+        }
+        system.debug('oooffcsByUserId -> '+oooffcsByUserId);
+        Map<Id, Project_Assigned_Resource__c> PARsMap = new Map<Id, Project_Assigned_Resource__c>(PARs);
         for (Resource_Task__c tsk1 : tasks) {
             if(tsk1.Start_Date__c>tsk1.End_Date__c){
                 error = 'The tasks StartDate must be before the EndDate';
             } else{
+                if(oooffcsByUserId.get(tsk1.Project_Assigned_Resource__r.User__c)!=null){
+                    system.debug('dentro del for de tasks con usuario con vacaciones');
+                    for (out_of_office__c oooff1 : oooffcsByUserId.get(tsk1.Project_Assigned_Resource__r.User__c)) {
+                        system.debug('Dentro del loop de los outOfOffices');
+                        if((tsk1.Start_Date__c>=oooff1.start_date__c && tsk1.Start_Date__c<=oooff1.end_date__c)||(tsk1.End_Date__c>=oooff1.start_date__c && tsk1.End_Date__c<=oooff1.end_date__c)){
+                            system.debug('Dentro del for del outOfOffice y el if de dates');
+                            error = 'The resource is out of office during the assigned task dates range';
+                        }
+                    }
+                }
                 if(PARsMap.get(tsk1.Project_Assigned_Resource__c).Start_Date__c > tsk1.Start_Date__c || PARsMap.get(tsk1.Project_Assigned_Resource__c).End_Date__c < tsk1.End_Date__c){
                     error = 'The task Start and End dates are not inside the dates range of the Project_Assigned_Resource';
                 }
@@ -547,7 +577,29 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled
     public static List<Project_Assigned_Resource__c> getPARsByProjectIdAndUserId(Id projectId, Id userId){
-        return [SELECT User__c, User__r.Name, Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId AND User__c =: userId];
+        List<Project_Assigned_Resource__c> PARs = [SELECT User__c, User__r.Name, Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId AND User__c =: userId];
+        List<out_of_office__c> oooffcs = [SELECT User__c, start_date__c, end_date__c FROM out_of_office__c WHERE User__c =:userId];
+        List<Project_Assigned_Resource__c> filteredPARs = new List<Project_Assigned_Resource__c>();
+        for (Project_Assigned_Resource__c par : PARs) {
+            Boolean isContained = false;
+            for(out_of_office__c oooff : oooffcs){
+                if(par.Start_Date__c<oooff.start_date__c){
+                    if(par.End_Date__c>oooff.start_date__c && par.End_Date__c<oooff.end_date__c){
+                        par.End_Date__c = oooff.start_date__c - 1;
+                    }
+                } else {
+                    if(par.End_Date__c <= oooff.end_date__c){
+                        isContained = true;
+                    } else{
+                        par.Start_Date__c = oooff.end_date__c + 1;
+                    }
+                }
+            }
+            if(!isContained){
+                filteredPARs.add(par);
+            }
+        }
+        return filteredPARs;
     }
 
     @AuraEnabled(cacheable=true)
