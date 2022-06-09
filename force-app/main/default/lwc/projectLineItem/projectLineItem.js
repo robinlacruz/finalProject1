@@ -133,6 +133,7 @@ export default class ProjectLineItem extends LightningElement {
         Resource_Rate__c: user.Rate_p_hour__c
       };
     });
+    console.log(JSON.stringify(parsToInsert));
 
     insertPARs({ resources: parsToInsert })
       .then((data) => {

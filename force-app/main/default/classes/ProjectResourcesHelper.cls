@@ -78,7 +78,7 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=false) // testeado
     public static String insertPARs(List<Project_Assigned_Resource__c>  resources){
-        system.debug('dentro de insertPARs');
+        
         List<Project_Assigned_Resource__c> resourcesList = new List<Project_Assigned_Resource__c>();
         try{
            
@@ -280,13 +280,10 @@ public with sharing class ProjectResourcesHelper {
                     error = 'The task Start and End dates are not inside the dates range of the Project_Assigned_Resource';
                 }
             }
-            system.debug('error');
-            system.debug(error);
             if(error!=null){
                 tsk1.addError(error);
             }
         }
-        system.debug(error);
     }
       
     @AuraEnabled
@@ -377,8 +374,6 @@ public with sharing class ProjectResourcesHelper {
             bookedDatesByUserId.put(par.User__c,bookedDates);
             bussyResoursesIds.add(par.User__c);
         }
-        system.debug('bookedDatesByUserId');
-        system.debug(bookedDatesByUserId);
         // Creates a map with user Ids as keys and vacation dates (startDate - endDate) as values 
         Map<Id,List<DatesWrapper>> vacationDatesByUserId = new Map<Id,List<DatesWrapper>>();
         for (out_of_office__c oooff : OOOffList) {
@@ -390,9 +385,6 @@ public with sharing class ProjectResourcesHelper {
             vacationDatesByUserId.put(oooff.User__c,vacationDates);
             bussyResoursesIds.add(oooff.User__c);
         }
-        system.debug('vacationDatesByUserId');
-        system.debug(vacationDatesByUserId);
-
         // Creates a map with user Ids as keys and bussy dates (startDate - endDate) as values
         Map<Id,List<DatesWrapper>> bussyDatesByUserId = new Map<Id,List<DatesWrapper>>();
         for(Id usrId : bussyResoursesIds){
@@ -405,8 +397,7 @@ public with sharing class ProjectResourcesHelper {
                     overlappedBussyList.addAll(bookedDatesByUserId.get(usrId));
                     overlappedBussyList.addAll(vacationDatesByUserId.get(usrId));
                     overlappedBussyList.sort();
-                    system.debug('overlappedBussyList de usrId'+usrId);
-                    system.debug(overlappedBussyList);
+                   
                     for (Integer i=0;i< overlappedBussyList.size();i++) {
                         if(i<overlappedBussyList.size()-1){ // it isnt the last element of the list
                             if(overlappedBussyList[i].endDate<overlappedBussyList[i+1].startDate){
@@ -429,7 +420,7 @@ public with sharing class ProjectResourcesHelper {
                                         if(overlappedBussyList[i].endDate>overlappedBussyList[j+1].endDate){
                                             overlappedBussyList.remove(j+1);
                                             j=j-1;
-                                            system.debug('removiendo elemento '+overlappedBussyList[j+1]+'de overlappedBussyList del usrId '+usrId);
+                                        
                                         } 
                                     }
                                     if(overlappedBussyList[i].startDate>projectStartDate){
@@ -474,8 +465,6 @@ public with sharing class ProjectResourcesHelper {
             } else {
                 bussyDatesList=vacationDatesByUserId.get(usrId);
             }
-            system.debug('bussyDatesList userId: '+usrId);
-            system.debug(bussyDatesList);
             bussyDatesByUserId.put(usrId,bussyDatesList);
         }
 
@@ -550,7 +539,6 @@ public with sharing class ProjectResourcesHelper {
 
             }
             
-            system.debug(projectTasksMap);
             return projectTasksMap;                       
             }
 
