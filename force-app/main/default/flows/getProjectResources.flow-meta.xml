@@ -534,7 +534,7 @@
             <targetReference>getProjectLineITems</targetReference>
         </connector>
     </start>
-    <status>Active</status>
+    <status>Obsolete</status>
     <variables>
         <name>AllPAR</name>
         <dataType>SObject</dataType>

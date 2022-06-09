@@ -20,13 +20,6 @@ public with sharing class ProjectResourcesHelper {
         return resourcesByRole;
     } */
 
-    @AuraEnabled(cacheable=true)
-    public static List<Project__c> getProjectsOfCurrentUser(){
-        Id userId = UserInfo.getUserId();
-
-        return [SELECT id,Name,Squad_Lead__c FROM Project__c];
-    }
-
     @AuraEnabled(cacheable=false) //testeado
     public static List<User> getResourcesByRoleAndDate(String role, Date startDate, Date endDate) {
         List<Project_Assigned_Resource__c> PARs = [SELECT User__c FROM Project_Assigned_Resource__c WHERE ((End_Date__c >= :startDate AND End_Date__c <= :endDate) OR (Start_Date__c >= :startDate AND Start_Date__c <= :endDate) OR (Start_Date__c < :startDate AND End_Date__c > :endDate)) AND User__r.Role__c =: role];
@@ -46,20 +39,6 @@ public with sharing class ProjectResourcesHelper {
         return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c =: role AND Role__c != null];
     }    
 
-    @AuraEnabled(cacheable=true) //testeado
-    public static List<User> getResourcesByRoleAndProject(String role, Id projectId) {
-
-        List<Project_Assigned_Resource__c> pars = [SELECT id, Project_Line_Item__r.Role__c, Project_Line_Item__r.Project__c, User__c FROM Project_Assigned_Resource__c 
-                                                WHERE Project_Line_Item__r.Role__c =:role AND Project_Line_Item__r.Project__c =:projectId];
-        Set<Id> idsToQuery = new Set<Id>();
-       
-        for(Project_Assigned_Resource__c par : pars){
-            idsToQuery.add(par.User__c);
-        }
-        return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null AND Role__c =:role AND Id IN :idsToquery];
-    }    
-
-
     @AuraEnabled(cacheable=false) // testeado
     public static Map<Id,User> getResourcesByIdMap(List<User> resources){
         return new Map<Id,User>(resources);
@@ -78,7 +57,7 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=false) // testeado
     public static String insertPARs(List<Project_Assigned_Resource__c>  resources){
-        
+        system.debug('dentro de insertPARs');
         List<Project_Assigned_Resource__c> resourcesList = new List<Project_Assigned_Resource__c>();
         try{
            
@@ -93,7 +72,7 @@ public with sharing class ProjectResourcesHelper {
             return 'Operacion DML realizada correctamente';
         }
         catch(DmlException e){
-            throw new My1Exception(e.getMessage());
+            throw new My1Exception(e.getMessage());  
         }
     }
     
@@ -138,8 +117,6 @@ public with sharing class ProjectResourcesHelper {
     }
 
     //item.user__c,item.Start_Date__c,item.End_Date__c,item.Project_Line_Item__c
-    
-    //Método para validar que no haya 
     public static void validatePARs(List<Project_Assigned_Resource__c> PARsList){
 
         Set<Id> PLIIds = new Set<Id>();
@@ -149,7 +126,7 @@ public with sharing class ProjectResourcesHelper {
             resourcesIds.add(PAR.User__c);
         }
         List<Project_Line_Item__c> PLIs = [SELECT Project__r.Start_Date__c, Project__r.End_Date__c, Role__c FROM Project_Line_Item__c WHERE Id IN :PLIIds];
-        Map<Id,User> PARsByUserId = new Map<Id,User>([SELECT Id, Name, Role__c, (SELECT id,User__c,User__r.Name,Start_Date__c,End_Date__c FROM Project_Assigned_Resources__r WHERE End_Date__c>=:Date.Today()),(SELECT id,User__c,User__r.Name,start_date__c,end_date__c FROM out_of_office__r WHERE end_date__c>=:Date.Today()) FROM User WHERE Id IN :resourcesIds]);
+        Map<Id,User> PARsByUserId = new Map<Id,User>([SELECT Id, Name, Role__c, (SELECT id,User__c,User__r.Name,Start_Date__c,End_Date__c FROM Project_Assigned_Resources__r WHERE End_Date__c>=:Date.Today()),(SELECT id,User__c,User__r.Name,start_date__c,end_date__c FROM out_of_office__r WHERE end_date__c>=:Date.Today() AND Status__c = 'Approved') FROM User WHERE Id IN :resourcesIds]);
         Map<Id,Project_Line_Item__c> PLIsByPLIId = new Map<Id,Project_Line_Item__c>(PLIs);
         
         for(Project_Assigned_Resource__c item :PARsList){
@@ -268,22 +245,57 @@ public with sharing class ProjectResourcesHelper {
     public static void validateTasks(List<Resource_Task__c> tasks){
         String error=null;
         Set<Id> PARsIds = new Set<Id>();
+        Set<Id> userIds = new Set<Id>();
         for (Resource_Task__c tsk : tasks) {
             PARsIds.add(tsk.Project_Assigned_Resource__c);
         }
-        Map<Id, Project_Assigned_Resource__c> PARsMap = new Map<Id, Project_Assigned_Resource__c>([SELECT Id, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Id IN :PARsIds]);
+        List<Project_Assigned_Resource__c> PARs = [SELECT Id, Start_Date__c, End_Date__c,User__c FROM Project_Assigned_Resource__c WHERE Id IN :PARsIds];
+        for(Project_Assigned_Resource__c par : PARs){
+            userIds.add(par.User__c);
+        }
+        system.debug('tasks ->'+tasks);
+        system.debug('userIds -> '+userIds);
+        List<out_of_office__c> oooffcs = [SELECT User__c, start_date__c, end_date__c FROM out_of_office__c WHERE User__c IN :userIds AND Status__c='Approved'];
+        system.debug('oooffcs -> '+oooffcs);
+        //Create a Map with users Ids as keys and out_of_office lists as values
+        Map<Id,List<out_of_office__c>> oooffcsByUserId = new Map<Id,List<out_of_office__c>>();
+        for (out_of_office__c oooff : oooffcs) {
+            List<out_of_office__c> oooffList = new List<out_of_office__c>();
+            if(oooffcsByUserId.get(oooff.User__c)!=null){
+                oooffList.addAll(oooffcsByUserId.get(oooff.User__c));
+            }
+            oooffList.add(oooff);
+            oooffcsByUserId.put(oooff.User__c,oooffList);
+        }
+        system.debug('oooffcsByUserId -> '+oooffcsByUserId);
+        Map<Id, Project_Assigned_Resource__c> PARsMap = new Map<Id, Project_Assigned_Resource__c>(PARs);
         for (Resource_Task__c tsk1 : tasks) {
+            system.debug('iterando dentro del for de tasks');
             if(tsk1.Start_Date__c>tsk1.End_Date__c){
                 error = 'The tasks StartDate must be before the EndDate';
             } else{
+                system.debug('dentro del primer else del for');
+                if(oooffcsByUserId.get(PARsMap.get(tsk1.Project_Assigned_Resource__c).User__c)!=null){
+                    system.debug('dentro del for de tasks con usuario con vacaciones');
+                    for (out_of_office__c oooff1 : oooffcsByUserId.get(PARsMap.get(tsk1.Project_Assigned_Resource__c).User__c)) {
+                        system.debug('Dentro del loop de los outOfOffices');
+                        if((tsk1.Start_Date__c>=oooff1.start_date__c && tsk1.Start_Date__c<=oooff1.end_date__c)||(tsk1.End_Date__c>=oooff1.start_date__c && tsk1.End_Date__c<=oooff1.end_date__c)){
+                            system.debug('Dentro del for del outOfOffice y el if de dates');
+                            error = 'The resource is out of office during the assigned task dates range';
+                        }
+                    }
+                }
                 if(PARsMap.get(tsk1.Project_Assigned_Resource__c).Start_Date__c > tsk1.Start_Date__c || PARsMap.get(tsk1.Project_Assigned_Resource__c).End_Date__c < tsk1.End_Date__c){
                     error = 'The task Start and End dates are not inside the dates range of the Project_Assigned_Resource';
                 }
             }
+            system.debug('error');
+            system.debug(error);
             if(error!=null){
                 tsk1.addError(error);
             }
         }
+        system.debug(error);
     }
       
     @AuraEnabled
@@ -326,41 +338,11 @@ public with sharing class ProjectResourcesHelper {
         return projectsByIdMap;   
     }
 
-
-    /* global public with sharing class DatesWrapper implements Comparable{
-        //varibles
-        @AuraEnabled
-        public Date startDate;
-        @AuraEnabled
-        public Date endDate; 
-        
-        //Constructor
-        public DatesWrapper(Date startDate ,Date endDate){
-            this.startDate = startDate;
-            this.endDate = endDate;
-        }
-
-        global Integer compareTo(Object compareTo){
-            DatesWrapper compareToDateWrap = (DatesWrapper)compareTo;
-            Integer returnValue = 0;
-            if(this.startDate > compareToDateWrap.startDate){
-                returnValue = 1;
-            } else if(this.startDate < compareToDateWrap.startDate){
-                returnValue = -1;
-            } else if(this.startDate==null && compareToDateWrap.startDate!=null){
-                returnValue = -1;
-            } else if(this.startDate!=null && compareToDateWrap.startDate==null){
-                returnValue = 1;
-            }
-            return returnValue;
-        }
-    } */
-
     @AuraEnabled
     public static Map<Id,List<DatesWrapper>> getResourcesAvailability(Id projectId, Date projectStartDate, Date projectEndDate, String role){
         List<User> resources = [SELECT Id, Name FROM User WHERE Role__c =: role];
         List<Project_Assigned_Resource__c> PARsList = [SELECT User__c, User__r.Name, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE User__r.Role__c =: role AND (Start_Date__c <= :projectEndDate AND End_Date__c >= :projectStartDate) AND End_Date__c >= :Date.today() ORDER BY Start_Date__c];
-        List<out_of_office__c> OOOffList = [SELECT User__c, User__r.Name, start_date__c, end_date__c FROM out_of_office__c WHERE User__r.Role__c =: role AND End_Date__c >= :Date.today() AND (start_date__c <= :projectEndDate  AND end_date__c >= :projectStartDate) ORDER BY start_date__c];
+        List<out_of_office__c> OOOffList = [SELECT User__c, User__r.Name, start_date__c, end_date__c FROM out_of_office__c WHERE User__r.Role__c =: role AND End_Date__c >= :Date.today() AND (start_date__c <= :projectEndDate  AND end_date__c >= :projectStartDate) AND Status__c='Approved' ORDER BY start_date__c];
         
         // Creates a map with user Ids as keys and booked dates (startDate - endDate) as values  
         Map<Id,List<DatesWrapper>> bookedDatesByUserId = new Map<Id,List<DatesWrapper>>();
@@ -374,6 +356,8 @@ public with sharing class ProjectResourcesHelper {
             bookedDatesByUserId.put(par.User__c,bookedDates);
             bussyResoursesIds.add(par.User__c);
         }
+        system.debug('bookedDatesByUserId');
+        system.debug(bookedDatesByUserId);
         // Creates a map with user Ids as keys and vacation dates (startDate - endDate) as values 
         Map<Id,List<DatesWrapper>> vacationDatesByUserId = new Map<Id,List<DatesWrapper>>();
         for (out_of_office__c oooff : OOOffList) {
@@ -385,6 +369,9 @@ public with sharing class ProjectResourcesHelper {
             vacationDatesByUserId.put(oooff.User__c,vacationDates);
             bussyResoursesIds.add(oooff.User__c);
         }
+        system.debug('vacationDatesByUserId');
+        system.debug(vacationDatesByUserId);
+
         // Creates a map with user Ids as keys and bussy dates (startDate - endDate) as values
         Map<Id,List<DatesWrapper>> bussyDatesByUserId = new Map<Id,List<DatesWrapper>>();
         for(Id usrId : bussyResoursesIds){
@@ -397,7 +384,8 @@ public with sharing class ProjectResourcesHelper {
                     overlappedBussyList.addAll(bookedDatesByUserId.get(usrId));
                     overlappedBussyList.addAll(vacationDatesByUserId.get(usrId));
                     overlappedBussyList.sort();
-                   
+                    system.debug('overlappedBussyList de usrId'+usrId);
+                    system.debug(overlappedBussyList);
                     for (Integer i=0;i< overlappedBussyList.size();i++) {
                         if(i<overlappedBussyList.size()-1){ // it isnt the last element of the list
                             if(overlappedBussyList[i].endDate<overlappedBussyList[i+1].startDate){
@@ -420,7 +408,7 @@ public with sharing class ProjectResourcesHelper {
                                         if(overlappedBussyList[i].endDate>overlappedBussyList[j+1].endDate){
                                             overlappedBussyList.remove(j+1);
                                             j=j-1;
-                                        
+                                            system.debug('removiendo elemento '+overlappedBussyList[j+1]+'de overlappedBussyList del usrId '+usrId);
                                         } 
                                     }
                                     if(overlappedBussyList[i].startDate>projectStartDate){
@@ -465,6 +453,8 @@ public with sharing class ProjectResourcesHelper {
             } else {
                 bussyDatesList=vacationDatesByUserId.get(usrId);
             }
+            system.debug('bussyDatesList userId: '+usrId);
+            system.debug(bussyDatesList);
             bussyDatesByUserId.put(usrId,bussyDatesList);
         }
 
@@ -518,7 +508,9 @@ public with sharing class ProjectResourcesHelper {
     public static Map<String,List<Resource_Task__c>> getUserTasks(){
         
         Id userId = UserInfo.getUserId();
-        userId = '0058a00000LGNZ7AAP';
+        //Octavio ->
+        //Id userId = '0058a00000LgxtTAAR';
+        //Id userId = '0058a00000Lgxt9AAB';
         Set<Id> projectsID = new Set<Id>();
         
         try{
@@ -539,6 +531,7 @@ public with sharing class ProjectResourcesHelper {
 
             }
             
+            system.debug(projectTasksMap);
             return projectTasksMap;                       
             }
 
@@ -556,7 +549,49 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled
     public static List<Project_Assigned_Resource__c> getPARsByProjectIdAndUserId(Id projectId, Id userId){
-        return [SELECT User__c, User__r.Name, Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId AND User__c =: userId];
+        List<Project_Assigned_Resource__c> PARs = [SELECT User__c, User__r.Name, Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId AND User__c =: userId];
+        List<out_of_office__c> oooffcs = [SELECT User__c, start_date__c, end_date__c FROM out_of_office__c WHERE User__c =:userId AND Status__c='Approved'];
+        List<Project_Assigned_Resource__c> filteredPARs = new List<Project_Assigned_Resource__c>();
+        for (Project_Assigned_Resource__c par : PARs) {
+            Boolean isContained = false;
+            for(out_of_office__c oooff : oooffcs){
+                if(par.Start_Date__c<oooff.start_date__c){
+                    if(par.End_Date__c>oooff.start_date__c && par.End_Date__c<oooff.end_date__c){
+                        par.End_Date__c = oooff.start_date__c - 1;
+                    }
+                } else {
+                    if(par.End_Date__c <= oooff.end_date__c){
+                        isContained = true;
+                    } else{
+                        par.Start_Date__c = oooff.end_date__c + 1;
+                    }
+                }
+            }
+            if(!isContained){
+                filteredPARs.add(par);
+            }
+        }
+        return filteredPARs;
     }
+
+    @AuraEnabled(cacheable=true)
+    public static List<User> getResourcesByRoleAndProject(String role, Id projectId) {
+
+        List<Project_Assigned_Resource__c> pars = [SELECT id, Project_Line_Item__r.Role__c, Project_Line_Item__r.Project__c, User__c FROM Project_Assigned_Resource__c 
+                                                WHERE Project_Line_Item__r.Role__c =:role AND Project_Line_Item__r.Project__c =:projectId];
+        Set<Id> idsToQuery = new Set<Id>();
+       
+        for(Project_Assigned_Resource__c par : pars){
+            idsToQuery.add(par.User__c);
+        }
+        return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null AND Role__c =:role AND Id IN :idsToquery];
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Project__c> getProjectsOfCurrentUser(){
+        Id userId = UserInfo.getUserId();
+        return [SELECT id,Name,Squad_Lead__c FROM Project__c];
+    }
+
 
 }
