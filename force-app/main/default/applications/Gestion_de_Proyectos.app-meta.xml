@@ -36,9 +36,22 @@
     </profileActionOverrides>
     <profileActionOverrides>
         <actionName>View</actionName>
+        <content>Project_Record_Page</content>
+        <formFactor>Small</formFactor>
+        <pageOrSobjectType>Project__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Project Manager</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
         <content>out_of_office_Record_Page</content>
         <formFactor>Large</formFactor>
         <pageOrSobjectType>out_of_office__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Project Manager</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
         <content>Project_Record_Page</content>
         <formFactor>Large</formFactor>
         <pageOrSobjectType>Project__c</pageOrSobjectType>
@@ -50,6 +63,11 @@
         <content>out_of_office_Record_Page</content>
         <formFactor>Small</formFactor>
         <pageOrSobjectType>out_of_office__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Resource</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
         <content>Project_Record_Page</content>
         <formFactor>Small</formFactor>
         <pageOrSobjectType>Project__c</pageOrSobjectType>
@@ -96,6 +114,8 @@
         <type>Flexipage</type>
         <profile>Admin</profile>
     </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
         <content>Project_Record_Page1</content>
         <formFactor>Large</formFactor>
         <pageOrSobjectType>Project__c</pageOrSobjectType>
