@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
 	<types>
 		<members>*</members>
@@ -107,6 +107,10 @@
 		<name>ListView</name>
 	</types>
 	<types>
+        <members>*</members>
+        <name>PathAssistant</name>
+    </types>
+	<types>
 		<members>*</members>
 		<name>PathAssistant</name>
 	</types>
@@ -115,7 +119,7 @@
 		<name>PermissionSet</name>
 	</types>
 	<types>
-		<members>Admin</members>
+		<members>*</members>
 		<name>Profile</name>
 	</types>
 <!--	 -->
@@ -146,6 +150,7 @@
 		<members>Opportunity</members>
 		<members>Picklist</members>
 		<members>Sharing</members>
+		<members>PathAssistant</members>
 		<name>Settings</name>
 	</types>
 	<types>
@@ -155,6 +160,10 @@
 		<members>UserAppMenuCustomization</members>
 		<name>SharingRules</name>
 	</types>
+	<types>
+		<members>*</members>
+		<name>LightningMessageChannel</name>
+	</types>  
 	<types>
 		<members>*</members>
 		<name>StaticResource</name>

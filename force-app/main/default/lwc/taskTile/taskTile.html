@@ -1,0 +1,34 @@
+<template >
+    <template if:false={taskIsCompleted}>
+        <tr class="slds-hint-parent">
+            <td data-label="Subject">
+                <lightning-progress-ring value={progress} variant="base-autocomplete" style="float:left">
+                </lightning-progress-ring>
+                <div class="slds-truncate slds-align_absolute-center" title="Subject">{task.Subject__c}</div>
+              
+            </td>
+            <td data-label="Status">
+              <div class="slds-truncate slds-align_absolute-center" title="Status">{task.Status__c}</div>
+            </td>
+            <td data-label="Estimated hours">
+              <div class="slds-truncate slds-align_absolute-center" title="Estimated hours">{task.Allocated_Hours__c}</div>
+            </td>
+            <td data-label="Registered hours">
+              <div class="slds-truncate slds-align_absolute-center" title="Registered hours ">{task.Registered_Hours__c}</div>
+            </td>
+            <td data-label="Amount">
+              <div class="slds-truncate slds-align_absolute-center" title="Actions" style="">
+                <div if:true ={taskIsStarted} class="slds-align_absolute-center">
+                    <input type="number" name="loadHours" placeholder="enter hours" value={hours} onchange={handleInput}></input> 
+                    <lightning-button label="Load hours" title="Load hours" onclick={handleLoadHours} class="slds-m-left_x-small"></lightning-button>
+                    <lightning-button label="Mark as completed" title="Mark as completed" onclick={handleMarkCompleted} class="slds-m-left_x-small"></lightning-button>
+                </div>
+                <div if:false={taskIsStarted}>
+                    <lightning-button label="Start Task" title="Non-primary action" onclick={handleStartTask} class="slds-m-left_x-small">
+                    </lightning-button>
+                </div>
+              </div>
+            </td>
+          </tr>
+    </template>
+</template>
