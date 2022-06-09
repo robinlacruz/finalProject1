@@ -569,24 +569,4 @@ public with sharing class ProjectResourcesHelper {
         return [SELECT User__c, User__r.Name, Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId AND User__c =: userId];
     }
 
-    @AuraEnabled(cacheable=true)
-    public static List<User> getResourcesByRoleAndProject(String role, Id projectId) {
-
-        List<Project_Assigned_Resource__c> pars = [SELECT id, Project_Line_Item__r.Role__c, Project_Line_Item__r.Project__c, User__c FROM Project_Assigned_Resource__c 
-                                                WHERE Project_Line_Item__r.Role__c =:role AND Project_Line_Item__r.Project__c =:projectId];
-        Set<Id> idsToQuery = new Set<Id>();
-       
-        for(Project_Assigned_Resource__c par : pars){
-            idsToQuery.add(par.User__c);
-        }
-        return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null AND Role__c =:role AND Id IN :idsToquery];
-    }
-
-    @AuraEnabled(cacheable=true)
-    public static List<Project__c> getProjectsOfCurrentUser(){
-        Id userId = UserInfo.getUserId();
-        return [SELECT id,Name,Squad_Lead__c FROM Project__c];
-    }
-
-
 }
