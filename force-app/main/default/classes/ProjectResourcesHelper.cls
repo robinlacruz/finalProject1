@@ -270,12 +270,14 @@ public with sharing class ProjectResourcesHelper {
         system.debug('oooffcsByUserId -> '+oooffcsByUserId);
         Map<Id, Project_Assigned_Resource__c> PARsMap = new Map<Id, Project_Assigned_Resource__c>(PARs);
         for (Resource_Task__c tsk1 : tasks) {
+            system.debug('iterando dentro del for de tasks');
             if(tsk1.Start_Date__c>tsk1.End_Date__c){
                 error = 'The tasks StartDate must be before the EndDate';
             } else{
-                if(oooffcsByUserId.get(tsk1.Project_Assigned_Resource__r.User__c)!=null){
+                system.debug('dentro del primer else del for');
+                if(oooffcsByUserId.get(PARsMap.get(tsk1.Project_Assigned_Resource__c).User__c)!=null){
                     system.debug('dentro del for de tasks con usuario con vacaciones');
-                    for (out_of_office__c oooff1 : oooffcsByUserId.get(tsk1.Project_Assigned_Resource__r.User__c)) {
+                    for (out_of_office__c oooff1 : oooffcsByUserId.get(PARsMap.get(tsk1.Project_Assigned_Resource__c).User__c)) {
                         system.debug('Dentro del loop de los outOfOffices');
                         if((tsk1.Start_Date__c>=oooff1.start_date__c && tsk1.Start_Date__c<=oooff1.end_date__c)||(tsk1.End_Date__c>=oooff1.start_date__c && tsk1.End_Date__c<=oooff1.end_date__c)){
                             system.debug('Dentro del for del outOfOffice y el if de dates');
@@ -335,36 +337,6 @@ public with sharing class ProjectResourcesHelper {
         Map<Id,Project__c> projectsByIdMap = new Map<Id,Project__c>([SELECT Name, Stage__c, Squad_Lead__c, 	isCurrentUserSquadLead__c FROM Project__c WHERE Id IN :projectIds]);
         return projectsByIdMap;   
     }
-
-
-    /* global public with sharing class DatesWrapper implements Comparable{
-        //varibles
-        @AuraEnabled
-        public Date startDate;
-        @AuraEnabled
-        public Date endDate; 
-        
-        //Constructor
-        public DatesWrapper(Date startDate ,Date endDate){
-            this.startDate = startDate;
-            this.endDate = endDate;
-        }
-
-        global Integer compareTo(Object compareTo){
-            DatesWrapper compareToDateWrap = (DatesWrapper)compareTo;
-            Integer returnValue = 0;
-            if(this.startDate > compareToDateWrap.startDate){
-                returnValue = 1;
-            } else if(this.startDate < compareToDateWrap.startDate){
-                returnValue = -1;
-            } else if(this.startDate==null && compareToDateWrap.startDate!=null){
-                returnValue = -1;
-            } else if(this.startDate!=null && compareToDateWrap.startDate==null){
-                returnValue = 1;
-            }
-            return returnValue;
-        }
-    } */
 
     @AuraEnabled
     public static Map<Id,List<DatesWrapper>> getResourcesAvailability(Id projectId, Date projectStartDate, Date projectEndDate, String role){
