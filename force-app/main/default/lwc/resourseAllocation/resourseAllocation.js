@@ -5,14 +5,12 @@ export default class ResourseAllocation extends LightningElement {
     project;
     @api recordId;
     resourcesById;
-
+// connected Callback ? 
     @wire (getProjectAndPLIs,{projectId:'$recordId'})
     receivedProject(result){
-        console.log('cambio recordId');
         const {data,error} = result;
         if(data){
             this.project = data;
-            console.log('recibimos projects: ',data);
 
         } else if(error){
             console.log('Hubo error recibiendo projects', error);

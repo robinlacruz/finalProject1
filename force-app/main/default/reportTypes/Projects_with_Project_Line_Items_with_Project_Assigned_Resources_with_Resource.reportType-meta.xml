@@ -103,6 +103,11 @@
             <field>Estimated_Profit__c</field>
             <table>Project__c</table>
         </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>isCurrentUserSquadLead__c</field>
+            <table>Project__c</table>
+        </columns>
         <masterLabel>Projects</masterLabel>
     </sections>
     <sections>
@@ -275,6 +280,26 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>Start_Date__c</field>
+            <table>Project__c.Project_Line_Items__r.Project_Assigned_Resources__r.Resource_Tasks__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Status__c</field>
+            <table>Project__c.Project_Line_Items__r.Project_Assigned_Resources__r.Resource_Tasks__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Priority__c</field>
+            <table>Project__c.Project_Line_Items__r.Project_Assigned_Resources__r.Resource_Tasks__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Subject__c</field>
+            <table>Project__c.Project_Line_Items__r.Project_Assigned_Resources__r.Resource_Tasks__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Description__c</field>
             <table>Project__c.Project_Line_Items__r.Project_Assigned_Resources__r.Resource_Tasks__r</table>
         </columns>
         <masterLabel>Resource Tasks</masterLabel>
