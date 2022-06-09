@@ -18,7 +18,14 @@ public with sharing class ProjectResourcesHelperTest{
             if((par.End_Date__c >=startDate && par.End_Date__c <=endDate) || (par.Start_Date__c >= startDate & par.Start_Date__c <= endDate) || (par.Start_Date__c < startDate && par.End_Date__c > endDate))
                 userIds.add(par.User__c);
         }         
-
+        Profile p = [SELECT Id FROM Profile WHERE Name='Standard User'];
+        User us = new User(Alias = 'userWOOO', Email= 'userWithOutOfOffice@myorg.com', 
+                EmailEncodingKey='UTF-8', LastName='Testing', LanguageLocaleKey='en_US', 
+                LocaleSidKey='en_US', ProfileId = p.Id, 
+                TimeZoneSidKey='America/New_York', UserName= 'userWithOutOfOffice@myorg.com',
+                Role__c = 'Developer');
+        insert us;
+        listUsers.add(us);
         for(User u : listUsers){
             if(!userIds.contains(u.id)) {
               if(u.Role__c == 'Developer') devUserList.add(u); 
@@ -26,13 +33,11 @@ public with sharing class ProjectResourcesHelperTest{
               if(u.Role__c == 'Architect') archUserList.add(u); 
             }
         }
+
         List<User> getResByRoleAndDateDevs = ProjectResourcesHelper.getResourcesByRoleAndDate('Developer', startDate, endDate);
         List<User> getResByRoleAndDateCons = ProjectResourcesHelper.getResourcesByRoleAndDate('Consultant', startDate, endDate);
         List<User> getResByRoleAndDateArchs = ProjectResourcesHelper.getResourcesByRoleAndDate('Architect', startDate, endDate);
         
-        system.debug(devUserList.size());
-        system.debug(consUserList.size());
-        system.debug(archUserList.size());
         system.assertEquals(devUserList.size(), getResByRoleAndDateDevs.size());
         system.assertEquals(consUserList.size(), getResByRoleAndDateCons.size());
         system.assertEquals(archUserList.size(), getResByRoleAndDateArchs.size());
@@ -47,6 +52,14 @@ public with sharing class ProjectResourcesHelperTest{
         system.assertEquals(devUserSet, getResByRoleAndDateDevsSet);
         system.assertEquals(consUserSet, getResByRoleAndDateConsSet);
         system.assertEquals(archUserSet, getResByRoleAndDateArchsSet);
+
+        out_of_office__c outOfOff = new out_of_office__c(User__c = us.Id, start_date__c=startDate ,end_date__c=endDate, Status__c='Approved');
+        insert outOfOff;
+        getResByRoleAndDateDevs = ProjectResourcesHelper.getResourcesByRoleAndDate('Developer', startDate, endDate);
+        getResByRoleAndDateDevsSet = new Set<Id>((new Map<Id,User>(getResByRoleAndDateDevs)).keySet());
+        system.assertEquals(devUserList.size()-1, getResByRoleAndDateDevs.size());
+        devUserSet.remove(us.Id);
+        system.assertEquals(devUserSet, getResByRoleAndDateDevsSet);
     }
 
     @isTest
@@ -393,22 +406,32 @@ public with sharing class ProjectResourcesHelperTest{
         }
         system.assert(error==null);
         error=null;
+        delete pARs;
+        List<Project_Assigned_Resource__c> pARs1 = new List<Project_Assigned_Resource__c>();
+        for (Project_Assigned_Resource__c par : pARs) {
+            Map<String, Object> parMap = (Map<String, Object>) JSON.deserializeUntyped( JSON.serialize( par ) );
+            parMap.remove('Id');
+            Project_Assigned_Resource__c par1 = (Project_Assigned_Resource__c) JSON.deserialize( JSON.serialize( parMap ), Project_Assigned_Resource__c.class );
+            pARs1.add(par1);
+        }
+        pARs = pARs1;
         String usRole = usersByIdMap.get(pARs[0].User__c).Role__c;
         Id firstpARsUser = pARs[0].User__c;
         pARs[0].User__c = usRole=='Developer'? usersByRoleMap.get('Consultant')[0].Id : usRole=='Architect'? usersByRoleMap.get('Developer')[0].Id: usersByRoleMap.get('Architect')[0].Id;
         try{
-            update pARs;
+            insert pARs;
         }catch(Exception e){
             error = e.getMessage();
         }
         system.assert(error!=null);
         system.assert(error.contains('Los roles del User y el Project_Line_Item__c deben ser iguales'));
+        
         pARs[0].User__c = firstpARsUser;
         Date firstpARsStartDate = pARs[0].Start_Date__c;
         pARs[0].Start_Date__c = null;
         error=null;
         try{
-            update pARs;
+            insert pARs;
         }catch(Exception e){
             error = e.getMessage();
         }
@@ -419,7 +442,7 @@ public with sharing class ProjectResourcesHelperTest{
         pARs[0].End_Date__c = firstpARsStartDate.addDays(-10);
         error=null;
         try{
-            update pARs;
+            insert pARs;
         }catch(Exception e){
             error = e.getMessage();
         }
@@ -429,26 +452,36 @@ public with sharing class ProjectResourcesHelperTest{
         pARs[0].Start_Date__c = Date.today().addDays(-10);
         error=null;
         try{
-            update pARs;
+            insert pARs;
         }catch(Exception e){
             error = e.getMessage();
         }
         system.assert(error!=null);
         system.assert(error.contains('Las fechas de inicio y fin del proyecto no pueden ser fechas pasadas para'));
+        
         pARs[0].Start_Date__c = projects[0].Start_Date__c.addDays(-10);
         error=null;
         try{
-            update pARs;
+            insert pARs;
         }catch(Exception e){
             error = e.getMessage();
         }
         system.assert(error!=null);
         system.assert(error.contains('No se pueden asignar fechas fuera del rango de tiempo del proyecto para'));
+        
         pARs[0].Start_Date__c = projects[0].Start_Date__c;
         pARs[0].End_Date__c = projects[0].End_Date__c;
         error=null;
+        insert pARs;
+        pARs1 = new List<Project_Assigned_Resource__c>();
+        for (Project_Assigned_Resource__c par : pARs) {
+            Map<String, Object> parMap = (Map<String, Object>) JSON.deserializeUntyped( JSON.serialize( par ) );
+            parMap.remove('Id');
+            Project_Assigned_Resource__c par1 = (Project_Assigned_Resource__c) JSON.deserialize( JSON.serialize( parMap ), Project_Assigned_Resource__c.class );
+            pARs1.add(par1);
+        }
         try{
-            update pARs;
+            insert pARs1;
         }catch(Exception e){
             error = e.getMessage();
         }

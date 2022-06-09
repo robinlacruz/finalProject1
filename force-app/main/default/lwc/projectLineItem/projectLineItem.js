@@ -68,7 +68,7 @@ export default class ProjectLineItem extends LightningElement {
 
   getResources(role) {
     getResourcesByRole({
-      role: role /*  ,startDate:this.startDateFilter,endDate:this.endDateFilter */
+      role: role
     })
       .then((data) => {
         let resources = data;

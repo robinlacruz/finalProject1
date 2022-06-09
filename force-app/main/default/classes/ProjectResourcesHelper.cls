@@ -22,10 +22,14 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=false) //testeado
     public static List<User> getResourcesByRoleAndDate(String role, Date startDate, Date endDate) {
-        List<Project_Assigned_Resource__c> PARs = [SELECT User__c FROM Project_Assigned_Resource__c WHERE (End_Date__c >= :startDate AND End_Date__c <= :endDate) OR (Start_Date__c >= :startDate AND Start_Date__c <= :endDate) OR (Start_Date__c < :startDate AND End_Date__c > :endDate)];
+        List<Project_Assigned_Resource__c> PARs = [SELECT User__c FROM Project_Assigned_Resource__c WHERE ((End_Date__c >= :startDate AND End_Date__c <= :endDate) OR (Start_Date__c >= :startDate AND Start_Date__c <= :endDate) OR (Start_Date__c < :startDate AND End_Date__c > :endDate)) AND User__r.Role__c =: role];
         Set<Id> userIds = new Set<Id>();
         for (Project_Assigned_Resource__c par : PARS) {
             userIds.add(par.User__c);
+        }
+        List<out_of_office__c> outOfOffices = [Select User__c, start_date__c, end_date__c FROM out_of_office__c WHERE User__c NOT IN :userIds AND User__r.Role__c=:role AND Status__c='Approved' AND ((end_date__c >= :startDate AND end_date__c <= :endDate) OR (start_date__c >= :startDate AND start_date__c <= :endDate) OR (start_date__c < :startDate AND end_date__c > :endDate))];
+        for (out_of_office__c outOfOff : outOfOffices) {
+            userIds.add(outOfOff.User__c);
         }
         return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c =: role AND Id NOT IN :userIds];
     }
@@ -47,7 +51,7 @@ public with sharing class ProjectResourcesHelper {
 
     @AuraEnabled(cacheable=true) // testeado
     public static Project_Line_Item__c getProjectLineItem(Id pliId) {
-        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Estimated_Amount__c, Assigned_Amount__c, Current_Hours__c, Assigned_Hours__c, Project__c FROM Project_Line_Item__c WHERE Id =: pliId LIMIT 1];
+        return [SELECT Id, Name, Role__c, Estimated_Hours__c, Estimated_Amount__c, Assigned_Amount__c, Current_Hours__c, Assigned_Hours__c, Project__c, Project__r.Start_Date__c, Project__r.End_Date__c FROM Project_Line_Item__c WHERE Id =: pliId LIMIT 1];
     }
 
 
@@ -121,24 +125,29 @@ public with sharing class ProjectResourcesHelper {
             PLIIds.add(PAR.Project_Line_Item__c);
             resourcesIds.add(PAR.User__c);
         }
-        Map<Id,User> PARsByUserId = new Map<Id,User>([SELECT Id, Name, Role__c, (SELECT id,User__c,User__r.Name,Start_Date__c,End_Date__c FROM Project_Assigned_Resources__r WHERE End_Date__c>=:Date.Today()) FROM User WHERE Id IN :resourcesIds]);
-        Map<Id,Project_Line_Item__c> PLIsByPLIId = new Map<Id,Project_Line_Item__c>([SELECT Project__r.Start_Date__c, Project__r.End_Date__c, Role__c FROM Project_Line_Item__c WHERE Id IN :PLIIds]);
+        List<Project_Line_Item__c> PLIs = [SELECT Project__r.Start_Date__c, Project__r.End_Date__c, Role__c FROM Project_Line_Item__c WHERE Id IN :PLIIds];
+        Map<Id,User> PARsByUserId = new Map<Id,User>([SELECT Id, Name, Role__c, (SELECT id,User__c,User__r.Name,Start_Date__c,End_Date__c FROM Project_Assigned_Resources__r WHERE End_Date__c>=:Date.Today()),(SELECT id,User__c,User__r.Name,start_date__c,end_date__c FROM out_of_office__r WHERE end_date__c>=:Date.Today()) FROM User WHERE Id IN :resourcesIds]);
+        Map<Id,Project_Line_Item__c> PLIsByPLIId = new Map<Id,Project_Line_Item__c>(PLIs);
+        
         for(Project_Assigned_Resource__c item :PARsList){
             Project_Line_Item__c currentPLI = PLIsByPLIId.get(item.Project_Line_Item__c);
             User UserPARs = PARsByUserId.get(item.User__c);
             List<Project_Assigned_Resource__c> PARs = UserPARs.Project_Assigned_Resources__r;
+            List<out_of_office__c> OOOffList = UserPARs.out_of_office__r;
             String error = null;
             if(currentPLI.Role__c != UserPARs.Role__c){
                 error = 'Los roles del User y el Project_Line_Item__c deben ser iguales';
             } else {
-                error = ProjectResourcesHelper.validateAssignedDates(UserPARS.Name, item.Start_Date__c,item.End_Date__c,currentPLI,PARs);
+                error = ProjectResourcesHelper.validateAssignedDates(UserPARS.Name, item.Start_Date__c,item.End_Date__c,currentPLI,PARs,OOOffList);
             }  
             if( error!= null)
                 item.addError(error);
         }
+        
+
     }
 
-    public static String validateAssignedDates(String resourceName, Date startDate,Date endDate,Project_Line_Item__c currentPLI,List<Project_Assigned_Resource__c> userAssignedResources){
+    public static String validateAssignedDates(String resourceName, Date startDate,Date endDate,Project_Line_Item__c currentPLI,List<Project_Assigned_Resource__c> userAssignedResources, List<out_of_office__c> userOutOfOffices){
         String error;
         if(startDate==null || endDate ==null){
             return 'Se deben asignar ambas fechas para '+resourceName;
@@ -156,17 +165,6 @@ public with sharing class ProjectResourcesHelper {
 		String dayOfStartDate = getDayOfWeek(startDate);
         String dayOfEndDate= getDayOfWeek(endDate);
 
-        // Valida que las fechas no sean sabado o domingo
-        
-        /* if(dayOfStartDate == 'Saturday' || dayOfStartDate == 'Sunday'){
-                if(dayOfEndDate =='Saturday' || dayOfEndDate == 'Sunday'){
-                    error='No se pueden asignar dias no laborales como fecha de termino del proyecto para '+resourceName ;
-                    return error;
-                }
-            error='No se pueden asignar dias no laborales como fecha de inicio del proyecto para '+resourceName;
-            return error;		
-        } */
-
         Date projectStartDate = currentPLI.Project__r.Start_Date__c; 
         Date projectEndDate = currentPLI.Project__r.End_Date__c;
 
@@ -179,7 +177,16 @@ public with sharing class ProjectResourcesHelper {
             Date resourceStartDate = assignedResource.Start_Date__c; 
             Date resourceEndDate = assignedResource.End_Date__c;   
             if(startDate<=resourceEndDate && endDate>=resourceStartDate){
-                error='No pueden asignarse las fechas seleccionadas porque no estan disponibles para ' + assignedResource.user__r.Name;
+                error='No pueden asignarse las fechas seleccionadas porque no estan disponibles para ' + assignedResource.User__r.Name;
+                return error;
+            }
+        }
+        
+        for (out_of_office__c oooffice : userOutOfOffices) {
+            Date ooofficeStartDate = oooffice.start_date__c; 
+            Date ooofficeEndDate = oooffice.end_date__c;   
+            if(startDate<=ooofficeEndDate && endDate>=ooofficeStartDate){
+                error='No pueden asignarse las fechas seleccionadas porque el recurso ' + oooffice.User__r.Name +' esta out of office';
                 return error;
             }
         }
@@ -190,7 +197,7 @@ public with sharing class ProjectResourcesHelper {
     public static void validateUpdatePARs(List<Project_Assigned_Resource__c> OldPARsList,List<Project_Assigned_Resource__c> NewPARsList){
         for (Integer i=0;i<OldPARsList.size();i++) {
             if(OldPARsList[i].Project_Line_Item__c != NewPARsList[i].Project_Line_Item__c || OldPARsList[i].User__c != NewPARsList[i].User__c || OldPARsList[i].Start_Date__c != NewPARsList[i].Start_Date__c || OldPARsList[i].End_Date__c != NewPARsList[i].End_Date__c || OldPARsList[i].Assigned_Amount__c != NewPARsList[i].Assigned_Amount__c || OldPARsList[i].Assigned_Hour__c != NewPARsList[i].Assigned_Hour__c || OldPARsList[i].Resource_Rate__c != NewPARsList[i].Resource_Rate__c){
-                OldPARsList[i].addError('You can not change this field in an Project_Assigned_Resource Object');
+                OldPARsList[i].addError('You can not change this field in a Project_Assigned_Resource Object');
             }
         }
     }
@@ -300,7 +307,7 @@ public with sharing class ProjectResourcesHelper {
     }
 
 
-    public class DatesWrapper{
+    /* global public with sharing class DatesWrapper implements Comparable{
         //varibles
         @AuraEnabled
         public Date startDate;
@@ -312,55 +319,178 @@ public with sharing class ProjectResourcesHelper {
             this.startDate = startDate;
             this.endDate = endDate;
         }
-    }
+
+        global Integer compareTo(Object compareTo){
+            DatesWrapper compareToDateWrap = (DatesWrapper)compareTo;
+            Integer returnValue = 0;
+            if(this.startDate > compareToDateWrap.startDate){
+                returnValue = 1;
+            } else if(this.startDate < compareToDateWrap.startDate){
+                returnValue = -1;
+            } else if(this.startDate==null && compareToDateWrap.startDate!=null){
+                returnValue = -1;
+            } else if(this.startDate!=null && compareToDateWrap.startDate==null){
+                returnValue = 1;
+            }
+            return returnValue;
+        }
+    } */
 
     @AuraEnabled
     public static Map<Id,List<DatesWrapper>> getResourcesAvailability(Id projectId, Date projectStartDate, Date projectEndDate, String role){
-       // Project__c project = [SELECT Start_Date__c,End_Date__c FROM Project__c WHERE Id =: projectId];
         List<User> resources = [SELECT Id, Name FROM User WHERE Role__c =: role];
-        List<Project_Assigned_Resource__c> PARsList = [SELECT User__c, User__r.Name, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE Start_Date__c <= :projectEndDate AND User__r.Role__c =: role AND End_Date__c >= :projectStartDate AND End_Date__c >= :Date.today() ORDER BY Start_Date__c];
-        // Creates a map with user Ids keys and lists of Project_Assigned_Resources__c as values 
-        Map<Id,List<Project_Assigned_Resource__c>> PARsByUserIdMap = new Map<Id,List<Project_Assigned_Resource__c>>();
+        List<Project_Assigned_Resource__c> PARsList = [SELECT User__c, User__r.Name, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE User__r.Role__c =: role AND (Start_Date__c <= :projectEndDate AND End_Date__c >= :projectStartDate) AND End_Date__c >= :Date.today() ORDER BY Start_Date__c];
+        List<out_of_office__c> OOOffList = [SELECT User__c, User__r.Name, start_date__c, end_date__c FROM out_of_office__c WHERE User__r.Role__c =: role AND End_Date__c >= :Date.today() AND (start_date__c <= :projectEndDate  AND end_date__c >= :projectStartDate) ORDER BY start_date__c];
+        
+        // Creates a map with user Ids as keys and booked dates (startDate - endDate) as values  
+        Map<Id,List<DatesWrapper>> bookedDatesByUserId = new Map<Id,List<DatesWrapper>>();
+        Set<Id> bussyResoursesIds = new Set<Id>();
         for (Project_Assigned_Resource__c par : PARsList) {
-            List<Project_Assigned_Resource__c> assignedPARs = new List<Project_Assigned_Resource__c>();
-            if(PARsByUserIdMap.get(par.User__c)!=null){
-                assignedPARs.addAll(PARsByUserIdMap.get(par.User__c));
+            List<DatesWrapper> bookedDates = new List<DatesWrapper>();
+            if(bookedDatesByUserId.get(par.User__c)!=null){
+                bookedDates.addAll(bookedDatesByUserId.get(par.User__c));
             }
-            assignedPARs.add(par);
-            PARsByUserIdMap.put(par.User__c,assignedPARs);
+            bookedDates.add(new DatesWrapper(par.Start_Date__c,par.End_Date__c));
+            bookedDatesByUserId.put(par.User__c,bookedDates);
+            bussyResoursesIds.add(par.User__c);
         }
-        // Creates a map with user Ids as keys and lists of available dates (startDate - endDate) as values 
-        Map<Id,List<DatesWrapper>> availDatesByUserId = new Map<Id,List<DatesWrapper>>();
-        for (Id userId : PARsByUserIdMap.keySet()) {
-            List<DatesWrapper> availableDatesList = new List<DatesWrapper>();
-            if(PARsByUserIdMap.get(userId).size()>0){
-                for (Integer i=0;i<PARsByUserIdMap.get(userId).size();i++) {
-                    if(i==0){
-                        if(PARsByUserIdMap.get(userId)[i].Start_Date__c>projectStartDate){
-                            availableDatesList.add(new DatesWrapper(projectStartDate,PARsByUserIdMap.get(userId)[i].Start_Date__c-1));
-                        }
-                        if(i==PARsByUserIdMap.get(userId).size()-1){
-                            if(PARsByUserIdMap.get(userId)[i].End_Date__c<projectEndDate){
-                                availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i].End_Date__c+1,projectEndDate));
+        system.debug('bookedDatesByUserId');
+        system.debug(bookedDatesByUserId);
+        // Creates a map with user Ids as keys and vacation dates (startDate - endDate) as values 
+        Map<Id,List<DatesWrapper>> vacationDatesByUserId = new Map<Id,List<DatesWrapper>>();
+        for (out_of_office__c oooff : OOOffList) {
+            List<DatesWrapper> vacationDates = new List<DatesWrapper>();
+            if(vacationDatesByUserId.get(oooff.User__c)!=null){
+                vacationDates.addAll(vacationDatesByUserId.get(oooff.User__c));
+            }
+            vacationDates.add(new DatesWrapper(oooff.start_date__c,oooff.end_date__c));
+            vacationDatesByUserId.put(oooff.User__c,vacationDates);
+            bussyResoursesIds.add(oooff.User__c);
+        }
+        system.debug('vacationDatesByUserId');
+        system.debug(vacationDatesByUserId);
+
+        // Creates a map with user Ids as keys and bussy dates (startDate - endDate) as values
+        Map<Id,List<DatesWrapper>> bussyDatesByUserId = new Map<Id,List<DatesWrapper>>();
+        for(Id usrId : bussyResoursesIds){
+            List<DatesWrapper> bussyDatesList = new List<DatesWrapper>();
+            if(bookedDatesByUserId.get(usrId)!=null){
+                if(vacationDatesByUserId.get(usrId)==null){
+                    bussyDatesList=bookedDatesByUserId.get(usrId);
+                } else { // the user has both bookedDates and vacationDates
+                    List<DatesWrapper> overlappedBussyList = new List<DatesWrapper>();
+                    overlappedBussyList.addAll(bookedDatesByUserId.get(usrId));
+                    overlappedBussyList.addAll(vacationDatesByUserId.get(usrId));
+                    overlappedBussyList.sort();
+                    system.debug('overlappedBussyList de usrId'+usrId);
+                    system.debug(overlappedBussyList);
+                    for (Integer i=0;i< overlappedBussyList.size();i++) {
+                        if(i<overlappedBussyList.size()-1){ // it isnt the last element of the list
+                            if(overlappedBussyList[i].endDate<overlappedBussyList[i+1].startDate){
+                                if(overlappedBussyList[i].startDate>projectStartDate){
+                                    bussyDatesList.add(new DatesWrapper(overlappedBussyList[i].startDate,overlappedBussyList[i].endDate));
+                                } else {
+                                    bussyDatesList.add(new DatesWrapper(projectStartDate,overlappedBussyList[i].endDate));
+                                }
+                            } else { 
+                                if(overlappedBussyList[i].endDate<overlappedBussyList[i+1].endDate){
+                                    if(overlappedBussyList[i].startDate>projectStartDate){
+                                        bussyDatesList.add(new DatesWrapper(overlappedBussyList[i].startDate,overlappedBussyList[i].endDate));
+                                        overlappedBussyList[i+1].startDate = overlappedBussyList[i].endDate + 1;
+                                    } else {
+                                        bussyDatesList.add(new DatesWrapper(projectStartDate,overlappedBussyList[i].endDate));
+                                        overlappedBussyList[i+1].startDate = overlappedBussyList[i].endDate + 1;
+                                    }
+                                } else {
+                                    for(Integer j=i;j<overlappedBussyList.size()-1;j++){
+                                        if(overlappedBussyList[i].endDate>overlappedBussyList[j+1].endDate){
+                                            overlappedBussyList.remove(j+1);
+                                            j=j-1;
+                                            system.debug('removiendo elemento '+overlappedBussyList[j+1]+'de overlappedBussyList del usrId '+usrId);
+                                        } 
+                                    }
+                                    if(overlappedBussyList[i].startDate>projectStartDate){
+                                            bussyDatesList.add(new DatesWrapper(overlappedBussyList[i].startDate,overlappedBussyList[i].endDate));
+                                            //overlappedBussyList.remove(i+1);
+                                    } else {
+                                            bussyDatesList.add(new DatesWrapper(projectStartDate,overlappedBussyList[i].endDate));
+                                            //overlappedBussyList.remove(i+1);
+                                    }
+                                }
+
+                            }
+                        } else { // it is the last element of the list
+                            if(i==0){ // it is the only element of the list
+                                if(overlappedBussyList[i].startDate < projectStartDate){
+                                    bussyDatesList.add(new DatesWrapper(projectStartDate,overlappedBussyList[i].endDate));
+                                } else {
+                                    if(overlappedBussyList[i].endDate < projectEndDate){
+                                        bussyDatesList.add(new DatesWrapper(overlappedBussyList[i].startDate,overlappedBussyList[i].endDate));
+                                    } else {
+                                        bussyDatesList.add(new DatesWrapper(overlappedBussyList[i].startDate,projectEndDate));
+                                    }
+                                }
+                            } else {
+                                if(overlappedBussyList[i].startDate < projectStartDate){
+                                    if(overlappedBussyList[i].endDate < projectEndDate){
+                                        bussyDatesList.add(new DatesWrapper(projectStartDate,overlappedBussyList[i].endDate));
+                                    } else {
+                                        bussyDatesList.add(new DatesWrapper(projectStartDate,projectEndDate));
+                                    }
+                                } else {
+                                    if(overlappedBussyList[i].endDate < projectEndDate){
+                                        bussyDatesList.add(new DatesWrapper(overlappedBussyList[i].startDate,overlappedBussyList[i].endDate));
+                                    } else {
+                                        bussyDatesList.add(new DatesWrapper(overlappedBussyList[i].startDate,projectEndDate));
+                                    }
+                                }
                             }
                         }
-                    } else if(i == PARsByUserIdMap.get(userId).size()-1){
-                        if(PARsByUserIdMap.get(userId)[i].End_Date__c < projectEndDate){
-                            availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i].End_Date__c+1, projectEndDate));
+                    }
+                }
+            } else {
+                bussyDatesList=vacationDatesByUserId.get(usrId);
+            }
+            system.debug('bussyDatesList userId: '+usrId);
+            system.debug(bussyDatesList);
+            bussyDatesByUserId.put(usrId,bussyDatesList);
+        }
+
+
+
+        // Creates a map with user Ids as keys and lists of available dates (startDate - endDate) as values 
+        Map<Id,List<DatesWrapper>> availDatesByUserId = new Map<Id,List<DatesWrapper>>();
+        for (Id userId : bussyDatesByUserId.keySet()) {
+            List<DatesWrapper> availableDatesList = new List<DatesWrapper>();
+            if(bussyDatesByUserId.get(userId).size()>0){
+                for (Integer i=0;i<bussyDatesByUserId.get(userId).size();i++) {
+                    if(i==0){
+                        if(bussyDatesByUserId.get(userId)[i].startDate>projectStartDate){
+                            availableDatesList.add(new DatesWrapper(projectStartDate,bussyDatesByUserId.get(userId)[i].startDate-1));
                         }
-                        if(PARsByUserIdMap.get(userId)[i].Start_Date__c > PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1){
-                            availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1, PARsByUserIdMap.get(userId)[i].Start_Date__c - 1));
+                        if(i==bussyDatesByUserId.get(userId).size()-1){
+                            if(bussyDatesByUserId.get(userId)[i].endDate<projectEndDate){
+                                availableDatesList.add(new DatesWrapper(bussyDatesByUserId.get(userId)[i].endDate+1,projectEndDate));
+                            }
+                        }
+                    } else if(i == bussyDatesByUserId.get(userId).size()-1){
+                        if(bussyDatesByUserId.get(userId)[i].endDate < projectEndDate){
+                            availableDatesList.add(new DatesWrapper(bussyDatesByUserId.get(userId)[i].endDate+1, projectEndDate));
+                        }
+                        if(bussyDatesByUserId.get(userId)[i].startDate > bussyDatesByUserId.get(userId)[i-1].endDate + 1){
+                            availableDatesList.add(new DatesWrapper(bussyDatesByUserId.get(userId)[i-1].endDate + 1, bussyDatesByUserId.get(userId)[i].startDate - 1));
                         }
 
                     } else {
-                        if(PARsByUserIdMap.get(userId)[i].Start_Date__c > PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1){
-                            availableDatesList.add(new DatesWrapper(PARsByUserIdMap.get(userId)[i-1].End_Date__c + 1, PARsByUserIdMap.get(userId)[i].Start_Date__c - 1));
+                        if(bussyDatesByUserId.get(userId)[i].startDate > bussyDatesByUserId.get(userId)[i-1].endDate + 1){
+                            availableDatesList.add(new DatesWrapper(bussyDatesByUserId.get(userId)[i-1].endDate + 1, bussyDatesByUserId.get(userId)[i].startDate - 1));
                         }
                     }   
                 }
             }
             availDatesByUserId.put(userId, availableDatesList);
         }
+        // If the user is not assigned to any project in this project dates range:
         for (User usr : resources) {
             if(!availDatesByUserId.keySet().contains(usr.Id)){
                 List<DatesWrapper> availDatesList = new List<DatesWrapper>();
@@ -368,6 +498,7 @@ public with sharing class ProjectResourcesHelper {
                 availDatesByUserId.put(usr.Id,availDatesList);
             }
         }
+
         return availDatesByUserId;
     }
 
@@ -414,23 +545,29 @@ public with sharing class ProjectResourcesHelper {
         update task;
     }
 
-    /* @AuraEnabled
-    public static Map<Id,List<Project_Assigned_Resource__c>> getPARsByProjectIdAndRole(Id projectId, String role){
-        List<Project_Assigned_Resource__c> PARsList = [SELECT User__c, User__r.Name, Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId AND Project_Line_Item__r.Role__c =: role];
-        Map<Id,List<Project_Assigned_Resource__c>> PARsByUserIdMap = new Map<Id,List<Project_Assigned_Resource__c>>();
-        for (Project_Assigned_Resource__c par : PARsList) {
-            List<Project_Assigned_Resource__c> PARs = new List<Project_Assigned_Resource__c>();
-            if(PARsByUserIdMap.get(par.User__c)!=null){
-                PARs.addAll(PARsByUserIdMap.get(par.User__c));
-            }
-            PARs.add(par);
-            PARsByUserIdMap.put(par.User__c,PARs);
-        }
-        return PARsByUserIdMap;
-    } */
-
     @AuraEnabled
     public static List<Project_Assigned_Resource__c> getPARsByProjectIdAndUserId(Id projectId, Id userId){
         return [SELECT User__c, User__r.Name, Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId AND User__c =: userId];
     }
+
+    @AuraEnabled(cacheable=true)
+    public static List<User> getResourcesByRoleAndProject(String role, Id projectId) {
+
+        List<Project_Assigned_Resource__c> pars = [SELECT id, Project_Line_Item__r.Role__c, Project_Line_Item__r.Project__c, User__c FROM Project_Assigned_Resource__c 
+                                                WHERE Project_Line_Item__r.Role__c =:role AND Project_Line_Item__r.Project__c =:projectId];
+        Set<Id> idsToQuery = new Set<Id>();
+       
+        for(Project_Assigned_Resource__c par : pars){
+            idsToQuery.add(par.User__c);
+        }
+        return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null AND Role__c =:role AND Id IN :idsToquery];
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<Project__c> getProjectsOfCurrentUser(){
+        Id userId = UserInfo.getUserId();
+        return [SELECT id,Name,Squad_Lead__c FROM Project__c];
+    }
+
+
 }
