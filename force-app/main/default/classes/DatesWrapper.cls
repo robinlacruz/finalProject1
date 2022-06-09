@@ -22,6 +22,12 @@ global class DatesWrapper implements Comparable{
             returnValue = -1;
         } else if(this.startDate!=null && compareToDateWrap.startDate==null){
             returnValue = 1;
+        } else if(this.startDate == compareToDateWrap.startDate){
+            if(this.endDate < compareToDateWrap.endDate){
+                returnValue = -1;
+            } else if(this.endDate > compareToDateWrap.endDate){
+                returnValue = 1;
+            }
         }
         return returnValue;
     }

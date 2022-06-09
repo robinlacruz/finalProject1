@@ -41,17 +41,19 @@
                         <br>
                         <div style="display:flex;flex-wrap: wrap;justify-content:space-around;" class="slds-box slds-box_x-small">
                             <template for:each={availabilityByUserIdsMap} for:item="map">
-                                <span key={map.key}>
-                                    <lightning-card  title={map.key}>
-                                                <template if:true={map.value} for:each={map.value} for:item="val">
-                                                    <div key={val.startDate}>
-                                                        <div> <b>Start Date:</b> {val.startDate} &nbsp; <b>End Date:</b> {val.endDate}</div>
-                                                    </div>
-                                                </template> 
-                                                <template if:false={map.value}>
-                                                    <div> Not available dates for this project </div>
-                                                </template>
-                                    </lightning-card>
+                                <span key={map.key} class="slds-p-horizontal_xxx-small">
+                                    
+                                        <lightning-card  title={map.key}>
+                                                    <template if:true={map.value} for:each={map.value} for:item="val">
+                                                        <div key={val.startDate}>
+                                                            <div> <b>Start Date:</b> {val.startDate} &nbsp; <b>End Date:</b> {val.endDate}</div>
+                                                        </div>
+                                                    </template> 
+                                                    <template if:false={map.value}>
+                                                        <div> Not available dates for this project &emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;&nbsp;</div>
+                                                    </template>
+                                        </lightning-card>
+                                    
                                 </span>
                             </template>
                         </div>
