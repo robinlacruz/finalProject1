@@ -4,5 +4,11 @@
     <entityName>Project__c</entityName>
     <fieldName>Stage__c</fieldName>
     <masterLabel>PathOfProject</masterLabel>
+    <pathAssistantSteps>
+        <picklistValueName>In progress</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <picklistValueName>Pre-Kickoff</picklistValueName>
+    </pathAssistantSteps>
     <recordTypeName>__MASTER__</recordTypeName>
 </PathAssistant>

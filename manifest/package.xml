@@ -112,6 +112,10 @@
     </types>
 	<types>
 		<members>*</members>
+		<name>PathAssistant</name>
+	</types>
+	<types>
+		<members>*</members>
 		<name>PermissionSet</name>
 	</types>
 	<types>
@@ -155,6 +159,10 @@
 		<members>UserAppMenuCustomization</members>
 		<name>SharingRules</name>
 	</types>
+	<types>
+		<members>*</members>
+		<name>LightningMessageChannel</name>
+	</types>  
 	<types>
 		<members>*</members>
 		<name>StaticResource</name>

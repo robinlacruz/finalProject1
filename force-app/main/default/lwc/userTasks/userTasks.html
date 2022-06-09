@@ -1,14 +1,40 @@
 <template>
-    <div class="slds-p-around_medium">
-        <lightning-card>
-            <template if:true={userTasks}>
-                <template for:each={userTasks} for:item="projectTasks">
-                    <div key={userTasks.id}>
-                        <h1 style = "color:slategrey;font-size:16px">{projectTasks.project}</h1>
-                        <c-project-tasks current-project-tasks ={projectTasks.tasks}></c-project-tasks>
-                    </div>
+        <lightning-card class="slds-m-around_x-smal">
+                <template if:true={userTasks} for:each={userTasks} for:item="project">
+                        <div key={project.id} style="display:flex;">
+                          <lightning-icon icon-name="action:new_note" alternative-text="New note" title="New note" size="small"></lightning-icon>
+                          <h1 style = "color:slategrey;font-size:17px">{project.project}</h1>
+                        </div>
+                       
+                        <table key ={project.id} class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
+                            <thead>
+                              <tr class="slds-line-height_reset">
+                                <th class="" scope="col">
+                                  <div class="slds-truncate slds-align_absolute-center" title="Opportunity Name">TASKS</div>
+                                </th>
+                                <th class="" scope="col">
+                                  <div class="slds-truncate slds-align_absolute-center" title="Account Name">STATUS</div>
+                                </th>
+                                <th class="" scope="col">
+                                  <div class="slds-truncate slds-align_absolute-center" title="Close Date">ESTIMATED HOURS</div>
+                                </th>
+                                <th class="" scope="col">
+                                  <div class="slds-truncate slds-align_absolute-center" title="Stage">REGISTERED HOURS</div>
+                                </th>
+                                <th class="" scope="col">
+                                  <div class="slds-truncate slds-align_absolute-center"  title="Confidence">ACTIONS</div>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                <template if:true={project.tasks} for:each={project.tasks} for:item="task">
+                                    <c-task-tile task={task} key={task.id}></c-task-tile>
+                                </template>
+                            </tbody>
+                        </table>
+                        <br key={project.id}>
+            
+                      
                 </template> 
-            </template>
         </lightning-card>
-    </div>
 </template>

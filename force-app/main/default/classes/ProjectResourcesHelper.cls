@@ -20,6 +20,13 @@ public with sharing class ProjectResourcesHelper {
         return resourcesByRole;
     } */
 
+    @AuraEnabled(cacheable=true)
+    public static List<Project__c> getProjectsOfCurrentUser(){
+        Id userId = UserInfo.getUserId();
+
+        return [SELECT id,Name,Squad_Lead__c FROM Project__c];
+    }
+
     @AuraEnabled(cacheable=false) //testeado
     public static List<User> getResourcesByRoleAndDate(String role, Date startDate, Date endDate) {
         List<Project_Assigned_Resource__c> PARs = [SELECT User__c FROM Project_Assigned_Resource__c WHERE ((End_Date__c >= :startDate AND End_Date__c <= :endDate) OR (Start_Date__c >= :startDate AND Start_Date__c <= :endDate) OR (Start_Date__c < :startDate AND End_Date__c > :endDate)) AND User__r.Role__c =: role];
@@ -38,6 +45,20 @@ public with sharing class ProjectResourcesHelper {
     public static List<User> getResourcesByRole(String role) {
         return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c =: role AND Role__c != null];
     }    
+
+    @AuraEnabled(cacheable=true) //testeado
+    public static List<User> getResourcesByRoleAndProject(String role, Id projectId) {
+
+        List<Project_Assigned_Resource__c> pars = [SELECT id, Project_Line_Item__r.Role__c, Project_Line_Item__r.Project__c, User__c FROM Project_Assigned_Resource__c 
+                                                WHERE Project_Line_Item__r.Role__c =:role AND Project_Line_Item__r.Project__c =:projectId];
+        Set<Id> idsToQuery = new Set<Id>();
+       
+        for(Project_Assigned_Resource__c par : pars){
+            idsToQuery.add(par.User__c);
+        }
+        return [SELECT Id, Name, Role__c,Rate_p_hour__c FROM User WHERE Role__c != null AND Role__c =:role AND Id IN :idsToquery];
+    }    
+
 
     @AuraEnabled(cacheable=false) // testeado
     public static Map<Id,User> getResourcesByIdMap(List<User> resources){
@@ -506,9 +527,7 @@ public with sharing class ProjectResourcesHelper {
     public static Map<String,List<Resource_Task__c>> getUserTasks(){
         
         Id userId = UserInfo.getUserId();
-        //Octavio ->
-        //Id userId = '0058a00000LgxtTAAR';
-        //Id userId = '0058a00000Lgxt9AAB';
+        userId = '0058a00000LGNZ7AAP';
         Set<Id> projectsID = new Set<Id>();
         
         try{
