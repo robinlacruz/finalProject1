@@ -9,7 +9,6 @@ import getResourcesByRoleAndProject from "@salesforce/apex/ProjectResourcesHelpe
 import getPARsByProjectIdAndUserId from "@salesforce/apex/ProjectResourcesHelper.getPARsByProjectIdAndUserId";
 
 export default class TaskAllocation extends LightningElement {
-  @api recordId;
   project;
   optionsRole = [];
   optionsResources = [];
@@ -115,7 +114,7 @@ export default class TaskAllocation extends LightningElement {
       userId: this.fields.resourceId,
       startDate: this.fields.startDate,
       endDate: this.fields.endDate,
-      projectId: this.recordId
+      projectId: this.fields.projectId
     })
       .then((data) => {
         par = data;
@@ -215,7 +214,7 @@ export default class TaskAllocation extends LightningElement {
   handleCheckAvailableDates() {
     if (!this.showAvailability) {
       getPARsByProjectIdAndUserId({
-        projectId: this.recordId,
+        projectId: this.fields.projectId,
         userId: this.fields.resourceId
       })
         .then((data) => {

@@ -361,14 +361,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-<<<<<<< HEAD
         <field>Project__c.isCurrentUserSquadLead__c</field>
         <readable>false</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-=======
->>>>>>> nico
         <field>Resource_Task__c.Description__c</field>
         <readable>true</readable>
     </fieldPermissions>

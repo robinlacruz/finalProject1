@@ -6,13 +6,10 @@
 				<lightning-card>
 					<div class="slds-m-around_x-small">
 						<div class="slds-align_absolute-center">
-<<<<<<< HEAD
-=======
 							<lightning-combobox name="project" value={fields.projectId} placeholder="Select project"
 								options={optionsProject} onchange={handleFieldsChange}></lightning-combobox>
 						</div>
 						<div class="slds-align_absolute-center">
->>>>>>> nico
 							<lightning-radio-group name="role" label="Role" options={optionsRole} value={fields.role} type="radio"
 								onchange={handleFieldsChange}>
 							</lightning-radio-group>
@@ -98,22 +95,16 @@
 				</lightning-button>
 				<lightning-button variant="destructive-text" label="Cancel" title="Cancel" onclick={handleCancelTask} class="slds-m-left_x-small">
 				</lightning-button>
-<<<<<<< HEAD
 				<span if:false={showAvailability}><lightning-button variant="brand" label="Check Available Dates" title="Check Available Dates" onclick={handleCheckAvailableDates} class="slds-m-left_x-small">
 				</lightning-button></span>
 				<span if:true={showAvailability}><lightning-button variant="brand" label="Hide Available Dates" title="Check Available Dates" onclick={handleCheckAvailableDates} class="slds-m-left_x-small">
 				</lightning-button></span>
 			</Template>
 			<Template if:true={fields.resourceId}>
-=======
-				</Template>
-				<Template if:true={fields.resourceId}>
->>>>>>> nico
 					<lightning-button variant="brand" label="Create task" title="Create Task" onclick={handleCreateTask} class="slds-m-left_x-small">
 					</lightning-button>
 					<lightning-button variant="destructive-text" label="Cancel" title="Cancel" onclick={handleCancelTask} class="slds-m-left_x-small">
 					</lightning-button>
-<<<<<<< HEAD
 					<span if:false={showAvailability}><lightning-button variant="brand" label="Check Available Dates" title="Check Available Dates" onclick={handleCheckAvailableDates} class="slds-m-left_x-small">
 					</lightning-button></span>
 					<span if:true={showAvailability}><lightning-button variant="brand" label="Hide Available Dates" title="Check Available Dates" onclick={handleCheckAvailableDates} class="slds-m-left_x-small">
@@ -131,11 +122,5 @@
 					</template>
 			</div>
 		</template>
-=======
-				</Template>
-			
-		</div>
-	
->>>>>>> nico
 	</lightning-card>
 </template>
