@@ -54,22 +54,6 @@ export default class ProjectLineItem extends LightningElement {
   availabilityByUserIdsMap = [];
   showAvailability = false;
 
-<<<<<<< HEAD
-    @wire (getProjectLineItem,{pliId:'$pliId'})
-    receivedProjectLineItem(result){    
-        this.changedFlag=result;
-        const {data, error}=result;
-        if(data){
-            this.projectLineItem=data;
-            if(this.projectLineItem) 
-                this.getResources(this.projectLineItem.Role__c);          
-        } else if(error){
-            console.log('Hubo error recibiendo projectLineItem ->', error);
-        }
-    }
-    getResources(role){
-        getResourcesByRole({role:role/*  ,startDate:this.startDateFilter,endDate:this.endDateFilter */}).then(data=>{
-=======
   @wire(getProjectLineItem, { pliId: "$pliId" })
   receivedProjectLineItem(result) {
     this.changedFlag = result;
@@ -204,7 +188,6 @@ export default class ProjectLineItem extends LightningElement {
           endDate: this.endDateFilter
         })
           .then((data) => {
->>>>>>> temporal
             let resources = data;
             let data1 = [];
             resources.forEach((element) => {
@@ -268,103 +251,5 @@ export default class ProjectLineItem extends LightningElement {
         })
         .catch(console.log("Error retrieving resourcesAvailability"));
     }
-<<<<<<< HEAD
-    
-    async refresh() {
-        await refreshApex(this.changedFlag);
-        setTimeout(() => {
-            eval("$A.get('e.force:refreshView').fire();");
-        }, 500);
-        this.draftValues=[];
-        this.startDateFilter = null;
-        this.endDateFilter = null;
-        this.filterFlag = false;
-
-    }
-
-    handleSave(data) {
-        this.draftValues = data.detail.draftValues;
-        const parsToInsert= data.detail.draftValues.map(element => {
-            let user = this.resourcesById[element.resourceId];
-            let assignedHours = 8 * getBusinessDatesCount(new Date(element.startDate), new Date(element.endDate));
-            let assignedAmount = user.Rate_p_hour__c*assignedHours;
-            return {
-                Name:`${user.Role__c} - ${user.Name}`, 
-                User__c:user.Id,
-                Start_Date__c:element.startDate,
-                End_Date__c:element.endDate,
-                Project_Line_Item__c:this.projectLineItem.Id,
-                Assigned_Hour__c:parseInt(assignedHours),
-                Assigned_Amount__c:assignedAmount,
-                Resource_Rate__c:user.Rate_p_hour__c };
-        }); 
-
-        insertPARs({resources: parsToInsert}).then(data=>{
-            this.refresh();
-        }).catch(error=>{
-            this.showErrorToast('Error de Insercion',error.body.message,'error');
-        })
-        
-        function getBusinessDatesCount(startDate, endDate) {
-            let count = 0;
-            const curDate = new Date(startDate.getTime());
-            while (curDate <= endDate) {
-                const dayOfWeek = curDate.getDay();
-                if(dayOfWeek !== 5 && dayOfWeek !== 6) count++;
-                curDate.setDate(curDate.getDate() + 1);
-            }
-            return count;
-        }
-    }
-
-    showErrorToast(title,message,variant) {
-        const evt = new ShowToastEvent({
-            title: title,
-            message: message,
-            variant: variant,
-            mode: 'dismissable'
-        });
-        this.dispatchEvent(evt);
-    }
-
-    handleChange(event){
-        if(event.target.name == 'startDateFilter'){
-            this.startDateFilter=event.target.value;
-        }else if(event.target.name == 'endDateFilter'){
-            this.endDateFilter=event.target.value;
-        }
-    }
-
-    handleFilter(){
-        if(this.startDateFilter && this.endDateFilter){
-            if(this.projectLineItem){
-                this.filterFlag = true;
-                getResourcesByRoleAndDate({role:this.projectLineItem.Role__c ,startDate:this.startDateFilter,endDate:this.endDateFilter}).then(data=>{
-                    let resources = data;
-                    let data1 = [];
-                    resources.forEach(element => {
-                        data1.push({resourceId:element.Id,resourceName:element.Name,resourceRate:element.Rate_p_hour__c,startDate:null,endDate:null,pliId:this.pliId,resourceRole:element.Role__c});
-                    });
-                    this.resources = data1;
-                    console.log('recursos filtrados: ',this.resources);
-
-                }).catch(error=>{
-                    console.log('Hubo error recibiendo pliResources', error);
-                })
-            } else {console.log('No existe this.projectLineItem: ',this.projectLineItem)}
-        } else {
-            console.log('Se deben seleccionar ambas fechas para filtrar');
-        }
-    }
-
-    handleCancelFilter(){
-        this.startDateFilter = null;
-        this.endDateFilter = null;
-        if(this.filterFlag) this.getResources(this.projectLineItem.Role__c);
-    }
-
-}
-=======
   }
 }
->>>>>>> temporal
