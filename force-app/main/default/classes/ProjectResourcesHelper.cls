@@ -255,7 +255,7 @@ public with sharing class ProjectResourcesHelper {
         }
         system.debug('tasks ->'+tasks);
         system.debug('userIds -> '+userIds);
-        List<out_of_office__c> oooffcs = [SELECT User__c, start_date__c, end_date__c FROM out_of_office__c WHERE User__c IN :userIds];
+        List<out_of_office__c> oooffcs = [SELECT User__c, start_date__c, end_date__c FROM out_of_office__c WHERE User__c IN :userIds AND Status__c='Approved'];
         system.debug('oooffcs -> '+oooffcs);
         //Create a Map with users Ids as keys and out_of_office lists as values
         Map<Id,List<out_of_office__c>> oooffcsByUserId = new Map<Id,List<out_of_office__c>>();
@@ -342,7 +342,7 @@ public with sharing class ProjectResourcesHelper {
     public static Map<Id,List<DatesWrapper>> getResourcesAvailability(Id projectId, Date projectStartDate, Date projectEndDate, String role){
         List<User> resources = [SELECT Id, Name FROM User WHERE Role__c =: role];
         List<Project_Assigned_Resource__c> PARsList = [SELECT User__c, User__r.Name, Start_Date__c, End_Date__c FROM Project_Assigned_Resource__c WHERE User__r.Role__c =: role AND (Start_Date__c <= :projectEndDate AND End_Date__c >= :projectStartDate) AND End_Date__c >= :Date.today() ORDER BY Start_Date__c];
-        List<out_of_office__c> OOOffList = [SELECT User__c, User__r.Name, start_date__c, end_date__c FROM out_of_office__c WHERE User__r.Role__c =: role AND End_Date__c >= :Date.today() AND (start_date__c <= :projectEndDate  AND end_date__c >= :projectStartDate) ORDER BY start_date__c];
+        List<out_of_office__c> OOOffList = [SELECT User__c, User__r.Name, start_date__c, end_date__c FROM out_of_office__c WHERE User__r.Role__c =: role AND End_Date__c >= :Date.today() AND (start_date__c <= :projectEndDate  AND end_date__c >= :projectStartDate) AND Status__c='Approved' ORDER BY start_date__c];
         
         // Creates a map with user Ids as keys and booked dates (startDate - endDate) as values  
         Map<Id,List<DatesWrapper>> bookedDatesByUserId = new Map<Id,List<DatesWrapper>>();
@@ -550,7 +550,7 @@ public with sharing class ProjectResourcesHelper {
     @AuraEnabled
     public static List<Project_Assigned_Resource__c> getPARsByProjectIdAndUserId(Id projectId, Id userId){
         List<Project_Assigned_Resource__c> PARs = [SELECT User__c, User__r.Name, Start_Date__c,End_Date__c FROM Project_Assigned_Resource__c WHERE Project_Line_Item__r.Project__c =: projectId AND User__c =: userId];
-        List<out_of_office__c> oooffcs = [SELECT User__c, start_date__c, end_date__c FROM out_of_office__c WHERE User__c =:userId];
+        List<out_of_office__c> oooffcs = [SELECT User__c, start_date__c, end_date__c FROM out_of_office__c WHERE User__c =:userId AND Status__c='Approved'];
         List<Project_Assigned_Resource__c> filteredPARs = new List<Project_Assigned_Resource__c>();
         for (Project_Assigned_Resource__c par : PARs) {
             Boolean isContained = false;
