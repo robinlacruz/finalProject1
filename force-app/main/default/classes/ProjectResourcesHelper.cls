@@ -93,7 +93,7 @@ public with sharing class ProjectResourcesHelper {
             return 'Operacion DML realizada correctamente';
         }
         catch(DmlException e){
-            return 'Error DML' ;
+            throw new My1Exception(e.getMessage());
         }
     }
     
