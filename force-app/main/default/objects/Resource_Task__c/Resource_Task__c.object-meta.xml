@@ -153,12 +153,12 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
-    <label>Resource Task</label>
+    <label>Your Tasks</label>
     <nameField>
         <label>Resource Name</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>Resource Tasks</pluralLabel>
+    <pluralLabel>Your Tasks</pluralLabel>
     <searchLayouts></searchLayouts>
     <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>

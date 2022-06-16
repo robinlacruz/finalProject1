@@ -2,9 +2,12 @@
     <template if:false={taskIsCompleted}>
         <tr class="slds-hint-parent">
             <td data-label="Subject">
-                <lightning-progress-ring value={progress} variant="base-autocomplete" style="float:left">
-                </lightning-progress-ring>
-                <div class="slds-truncate slds-align_absolute-center" title="Subject">{task.Subject__c}</div>
+                <div style="display:flex;">
+                  <lightning-progress-ring value={progress} variant="base-autocomplete" style="float:left;margin-right:5px">
+                  </lightning-progress-ring>
+                  <div class="slds-truncate slds-align_absolute-center" title="Subject">{task.Subject__c}</div>
+                </div>
+              
               
             </td>
             <td data-label="Status">

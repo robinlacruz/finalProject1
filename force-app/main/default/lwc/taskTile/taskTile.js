@@ -12,6 +12,8 @@ export default class TaskTile extends LightningElement {
 
   connectedCallback() {
     this.task = JSON.parse(JSON.stringify(this.task));
+    if(this.task.Allocated_Hours__c!==0 && this.progress!==100)
+      this.progress = Math.round((this.task.Registered_Hours__c / this.task.Allocated_Hours__c)*100);
     if (this.task.Status__c != "Not Started") {
       this.taskIsStarted = true;
       if (this.task.Status__c == "Completed") {
@@ -27,13 +29,13 @@ export default class TaskTile extends LightningElement {
       this.task.Status__c = "Completed";
       this.taskIsCompleted = true;
       console.log(this.task.Status__c);
-      /*updateTask({ task: this.task })
+      updateTask({ task: this.task })
         .then(() => {
           console.log("Task succesfully updated");
         })
         .catch((error) => {
           console.log("Error updating task ", error);
-        });*/
+        });
     }
   }
 
@@ -43,12 +45,12 @@ export default class TaskTile extends LightningElement {
     this.hours = 0;
     if(this.task.Allocated_Hours__c!==0 && this.progress!==100)
       this.progress = Math.round((this.task.Registered_Hours__c / this.task.Allocated_Hours__c)*100);
-      /*updateTask({ task: this.task })
+      updateTask({ task: this.task })
       .then(() => {
         console.log("Task succesfully updated");
       }).catch((error) => {
         console.log("Error updating task ", error);
-      });*/
+      });
   }
 
   handleInput(evt) {
@@ -58,12 +60,12 @@ export default class TaskTile extends LightningElement {
   handleStartTask() {
     this.task.Status__c = "In Progress";
     this.taskIsStarted = true;
-    /*updateTask({ task: this.task })
+    updateTask({ task: this.task })
       .then(() => {
         console.log("Task succesfully updated");
       }).catch((error) => {
         console.log("Error updating task ", error);
-      });*/
+      });
     
   }
 

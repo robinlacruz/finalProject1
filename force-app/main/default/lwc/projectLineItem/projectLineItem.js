@@ -133,14 +133,14 @@ export default class ProjectLineItem extends LightningElement {
         Resource_Rate__c: user.Rate_p_hour__c
       };
     });
-    console.log(JSON.stringify(parsToInsert));
 
     insertPARs({ resources: parsToInsert })
       .then((data) => {
         this.refresh();
+        this.showErrorToast("Success", 'Resource allocation successfull', "success");
       })
       .catch((error) => {
-        this.showErrorToast("Error de Insercion", error.body.message, "error");
+        this.showErrorToast("Error", 'The START DATE must be LESS than the END DATE', "error");
       });
   }
 
@@ -177,8 +177,8 @@ export default class ProjectLineItem extends LightningElement {
     if (this.startDateFilter && this.endDateFilter) {
       if (this.startDateFilter > this.endDateFilter) {
         this.showErrorToast(
-          "Error de Filtrado",
-          "La fecha inicial debe ser menor o igual a la fecha final",
+          "Filter error",
+          "The START DATE must be LESS than the END DATE",
           "error"
         );
       } else if (this.projectLineItem) {
@@ -213,8 +213,8 @@ export default class ProjectLineItem extends LightningElement {
       }
     } else {
       this.showErrorToast(
-        "Error de Filtrado",
-        "Se deben ingresar ambas fechas para poder filtrar",
+        "Filter error",
+        "Both dates must be entered",
         "error"
       );
     }

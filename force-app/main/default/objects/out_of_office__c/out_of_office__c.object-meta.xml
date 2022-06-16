@@ -153,12 +153,12 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>Private</externalSharingModel>
-    <label>out of office</label>
+    <label>Out of office requests</label>
     <nameField>
         <label>out of office Name</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>out of office</pluralLabel>
+    <pluralLabel>Out of office requests</pluralLabel>
     <searchLayouts></searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>

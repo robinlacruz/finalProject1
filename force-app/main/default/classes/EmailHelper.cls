@@ -1,4 +1,4 @@
-public  class EmailHelper {
+global with sharing  class EmailHelper {
 
     public static void sendEmail(Project__c proj, String error){
         // If we know how many addresses the email will be sent to from this transaction

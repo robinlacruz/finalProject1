@@ -1,8 +1,10 @@
 <template>
         <lightning-card>
                 <template if:true={userTasks} for:each={userTasks} for:item="project">
+                  
+                  <template if:true={project.tasks}>
+               
                         <div key={project.id} style="display:flex;">
-                          <lightning-icon icon-name="action:new_note" alternative-text="New note" title="New note" size="small"></lightning-icon>
                           <h1 style = "color:slategrey;font-size:17px">{project.project}</h1>
                         </div>
                        
@@ -34,7 +36,7 @@
                         </table>
                         <br key={project.id}>
             
-                      
+                      </template>
                 </template> 
         </lightning-card>
 </template>

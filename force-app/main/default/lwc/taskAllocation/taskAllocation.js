@@ -43,6 +43,7 @@ export default class TaskAllocation extends LightningElement {
   @wire(getProjectsOfCurrentUser,{})
   receiveSLProjects(result) {
     const { data, error } = result;
+    console.log(data);
     if (data) {
       this.optionsProject = data.map((element) => {
         return { label: element.Name, value: element.Id };
@@ -157,11 +158,11 @@ export default class TaskAllocation extends LightningElement {
             );
           })
           .catch((error) => {
-            this.showErrorToast("Error", error.body.message, "error");
+            this.showErrorToast("Error", 'Problem with DML actions', "error");
           });
       })
       .catch((error) => {
-        this.showErrorToast("Error", error.body.message, "error");
+        this.showErrorToast("Error", 'Problem with DML actions', "error");
       });
   }
 

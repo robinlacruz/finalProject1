@@ -1,10 +1,19 @@
 /* eslint-disable guard-for-in */
 import { LightningElement, api, wire } from "lwc";
 import getUserTasks from "@salesforce/apex/ProjectResourcesHelper.getUserTasks";
+import setSquadLead from "@salesforce/apex/ProjectResourcesHelper.setSquadLead";
 export default class UserTasks extends LightningElement {
   @api recordId;
   userTasks = [];
   completedTasks = [];
+
+  connectedCallback(){
+    setSquadLead({}).then(()=>{
+      console.log('squadLead Setted')
+    }).catch(()=>{
+      console.log('squadLead Setted')
+    })
+  }
 
   @wire(getUserTasks, {})
   receivedUserTasks(result) {
