@@ -57,6 +57,7 @@
 		<members>Project__c</members>
 		<members>Resource_Task__c</members>
 		<members>User</members>
+		<members>Out_of_office__c</members>
 		<name>CustomObject</name>
 	</types>
 	<types>
