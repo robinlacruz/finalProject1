@@ -5,7 +5,7 @@
         <name>actualizar_fecha_fin_anterior</name>
         <label>actualizar fecha fin anterior</label>
         <locationX>1150</locationX>
-        <locationY>1934</locationY>
+        <locationY>1814</locationY>
         <assignmentItems>
             <assignToReference>fechaFinAnterior</assignToReference>
             <operator>Assign</operator>
@@ -14,7 +14,7 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>SumarUnDiaAAfechaFinAnterior_0</targetReference>
+            <targetReference>set_de_assigned_resources</targetReference>
         </connector>
     </assignments>
     <assignments>
@@ -30,14 +30,14 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>SumarUnDiaAAfechaFinAnterior</targetReference>
+            <targetReference>new_ofo_asignado_a_un_proyecto</targetReference>
         </connector>
     </assignments>
     <assignments>
         <name>agregar_ofo_con_proyecto_a_lista</name>
         <label>agregar ofo con proyecto a lista</label>
         <locationX>1150</locationX>
-        <locationY>1814</locationY>
+        <locationY>1694</locationY>
         <assignmentItems>
             <assignToReference>listOfOutOfOffice</assignToReference>
             <operator>Add</operator>
@@ -53,7 +53,7 @@
         <name>agregar_ultimo_a_lista_de_ofo</name>
         <label>agregar ultimo a lista de ofo</label>
         <locationX>798</locationX>
-        <locationY>2510</locationY>
+        <locationY>2270</locationY>
         <assignmentItems>
             <assignToReference>listOfOutOfOffice</assignToReference>
             <operator>Add</operator>
@@ -149,13 +149,6 @@
                 <elementReference>$User.LastName</elementReference>
             </value>
         </assignmentItems>
-        <assignmentItems>
-            <assignToReference>newOutOfOffice.OwnerId</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>$User.Id</elementReference>
-            </value>
-        </assignmentItems>
         <connector>
             <targetReference>new_ofo_sin_asingar</targetReference>
         </connector>
@@ -164,7 +157,7 @@
         <name>new_ofo_asignado_a_un_proyecto</name>
         <label>new ofo asignado a un proyecto</label>
         <locationX>1150</locationX>
-        <locationY>1694</locationY>
+        <locationY>1574</locationY>
         <assignmentItems>
             <assignToReference>newOutOfOffice.ProjectManager__c</assignToReference>
             <operator>Assign</operator>
@@ -249,13 +242,6 @@
                 <elementReference>$User.LastName</elementReference>
             </value>
         </assignmentItems>
-        <assignmentItems>
-            <assignToReference>newOutOfOffice.OwnerId</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>$User.Id</elementReference>
-            </value>
-        </assignmentItems>
         <connector>
             <targetReference>agregar_ofo_con_proyecto_a_lista</targetReference>
         </connector>
@@ -300,42 +286,10 @@
         </connector>
     </assignments>
     <assignments>
-        <name>SumarUnDiaAAfechaFinAnterior</name>
-        <label>SumarUnDiaAAfechaFinAnterior</label>
-        <locationX>1018</locationX>
-        <locationY>1478</locationY>
-        <assignmentItems>
-            <assignToReference>fechaFinAnterior</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <numberValue>1.0</numberValue>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>new_ofo_asignado_a_un_proyecto</targetReference>
-        </connector>
-    </assignments>
-    <assignments>
-        <name>SumarUnDiaAAfechaFinAnterior_0</name>
-        <label>SumarUnDiaAAfechaFinAnterior</label>
-        <locationX>1150</locationX>
-        <locationY>2054</locationY>
-        <assignmentItems>
-            <assignToReference>fechaFinAnterior</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <numberValue>1.0</numberValue>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>set_de_assigned_resources</targetReference>
-        </connector>
-    </assignments>
-    <assignments>
         <name>ultimo_ofo_sin_asignacion_a_proy</name>
         <label>ultimo ofo sin asignacion a proy</label>
         <locationX>798</locationX>
-        <locationY>2390</locationY>
+        <locationY>2150</locationY>
         <assignmentItems>
             <assignToReference>newOutOfOffice.Status__c</assignToReference>
             <operator>Assign</operator>
@@ -385,13 +339,6 @@
                 <elementReference>$User.LastName</elementReference>
             </value>
         </assignmentItems>
-        <assignmentItems>
-            <assignToReference>newOutOfOffice.OwnerId</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>$User.Id</elementReference>
-            </value>
-        </assignmentItems>
         <connector>
             <targetReference>agregar_ultimo_a_lista_de_ofo</targetReference>
         </connector>
@@ -401,7 +348,7 @@
         <elementSubtype>SortCollectionProcessor</elementSubtype>
         <label>ordenar lista de ofo</label>
         <locationX>930</locationX>
-        <locationY>2726</locationY>
+        <locationY>2486</locationY>
         <collectionProcessorType>SortCollectionProcessor</collectionProcessorType>
         <collectionReference>listOfOutOfOffice</collectionReference>
         <connector>
@@ -434,7 +381,7 @@
         <name>fin_de_ultimo_proyecto_es_menor_al_solicitado</name>
         <label>fin de ultimo proyecto es menor al solicitado</label>
         <locationX>930</locationX>
-        <locationY>2270</locationY>
+        <locationY>2030</locationY>
         <defaultConnector>
             <targetReference>ordenar_lista_de_ofo</targetReference>
         </defaultConnector>
@@ -530,9 +477,8 @@
             <label>crear un solo out of office</label>
         </rules>
     </decisions>
-    <interviewLabel>fuera de oficina {!$Flow.CurrentDateTime}</interviewLabel>
-    <isAdditionalPermissionRequiredToRun>true</isAdditionalPermissionRequiredToRun>
-    <label>fuera de oficina</label>
+    <interviewLabel>Out of Office V2 {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Out of Office V2</label>
     <loops>
         <name>recorrer_out_of_office</name>
         <label>recorrer out of office</label>
@@ -584,7 +530,7 @@
         <name>insertar_ofo</name>
         <label>insertar ofo</label>
         <locationX>930</locationX>
-        <locationY>2846</locationY>
+        <locationY>2606</locationY>
         <inputReference>listOfOutOfOffice</inputReference>
     </recordCreates>
     <recordCreates>
@@ -593,27 +539,9 @@
         <locationX>314</locationX>
         <locationY>758</locationY>
         <inputAssignments>
-            <field>Description__c</field>
-            <value>
-                <elementReference>Description</elementReference>
-            </value>
-        </inputAssignments>
-        <inputAssignments>
-            <field>OwnerId</field>
-            <value>
-                <elementReference>$User.Id</elementReference>
-            </value>
-        </inputAssignments>
-        <inputAssignments>
             <field>Status__c</field>
             <value>
                 <stringValue>Approved</stringValue>
-            </value>
-        </inputAssignments>
-        <inputAssignments>
-            <field>User__c</field>
-            <value>
-                <elementReference>$User.Id</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -802,7 +730,7 @@
         <allowPause>true</allowPause>
         <fields>
             <name>outOfOfficeExistentMessage</name>
-            <fieldText>&lt;p&gt;&lt;strong&gt;You already requested out of office for the following date ranges:&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!listOfOutOfOfficeText}&lt;/p&gt;</fieldText>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;font-size: 14px; color: rgb(0, 0, 0);&quot;&gt;Usted ya pidió out of office para los siguientes rangos de fecha:&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!listOfOutOfOfficeText}&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
         </fields>
         <showFooter>true</showFooter>
@@ -810,7 +738,7 @@
     </screens>
     <screens>
         <name>Fuera_de_oficina</name>
-        <label>Out of office</label>
+        <label>Fuera de oficina</label>
         <locationX>336</locationX>
         <locationY>158</locationY>
         <allowBack>true</allowBack>

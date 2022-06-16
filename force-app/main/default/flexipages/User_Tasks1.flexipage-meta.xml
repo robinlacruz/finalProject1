@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <flexiPageRegions>
+        <name>region1</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>allTasks</componentName>
+                <identifier>c_allTasks</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>region2</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>taskAllocation</componentName>
+                <identifier>c_taskAllocation</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!$User.imSquadLead__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <name>region3</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <masterLabel>User Tasks</masterLabel>
+    <template>
+        <name>flexipage:appHomeTemplateHeaderTwoColumnsEqualWidth</name>
+    </template>
+    <type>AppPage</type>
+</FlexiPage>

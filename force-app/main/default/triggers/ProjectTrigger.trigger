@@ -5,7 +5,7 @@ trigger ProjectTrigger on Project__c (before update) {
          
             if(!ProjectResourcesHelper.projectIsFull(proj)){
                 String error = 'El proyecto debe tener todas las horas asignadas para cambiar su estado a In progress';
-                ProjectResourcesHelper.sendEmail(proj, error);
+                EmailHelper.sendEmail(proj, error);
                 proj.addError(error);
             }
 

@@ -318,7 +318,7 @@
         <recordTriggerType>Update</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <status>Obsolete</status>
+    <status>Active</status>
     <textTemplates>
         <name>emailOutOfOfficeBody</name>
         <isViewedAsPlainText>true</isViewedAsPlainText>
